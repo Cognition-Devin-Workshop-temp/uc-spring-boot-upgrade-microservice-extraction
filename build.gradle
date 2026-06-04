@@ -96,6 +96,24 @@ tasks.named('test') {
 	finalizedBy jacocoTestReport
 }
 
+// Unit tests: core logic and API layer (mock-based)
+tasks.register('unitTest', Test) {
+	description = 'Run unit tests'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/core/**', 'io/spring/api/**'
+	exclude 'io/spring/selenium/**'
+}
+
+// Integration tests: DB/Spring context tests
+tasks.register('integrationTest', Test) {
+	description = 'Run integration tests'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/infrastructure/**', 'io/spring/application/**', 'io/spring/RealworldApplicationTests*'
+	exclude 'io/spring/selenium/**'
+}
+
 // Separate task for Selenium E2E tests using TestNG
 tasks.register('seleniumTest', Test) {
 	description = 'Run Selenium E2E tests'

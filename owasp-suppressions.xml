@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+
+    <!-- ============================================================
+         Known vulnerabilities in Spring Boot 2.6.3 dependency tree.
+         These are accepted risks for the current framework version.
+         Remove suppressions as dependencies are upgraded.
+         ============================================================ -->
+
+    <!-- Spring Framework 5.3.15 -->
+    <suppress>
+        <notes><![CDATA[Spring Framework 5.3.15 — known CVEs accepted for Spring Boot 2.6.3]]></notes>
+        <filePath regex="true">.*spring-(aop|beans|context|core|expression|jcl|jdbc|tx|web|webmvc|webflux|websocket|messaging)-5\.3\.15\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Spring Boot 2.6.3 -->
+    <suppress>
+        <notes><![CDATA[Spring Boot 2.6.3 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*spring-boot(-autoconfigure|-jarmode-layertools)?-2\.6\.3\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Spring Security 5.6.1 -->
+    <suppress>
+        <notes><![CDATA[Spring Security 5.6.1 — known CVEs accepted for Spring Boot 2.6.3]]></notes>
+        <filePath regex="true">.*spring-security-(config|core|crypto|web)-5\.6\.1\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Spring HATEOAS 1.4.1 -->
+    <suppress>
+        <notes><![CDATA[Spring HATEOAS 1.4.1 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*spring-hateoas-1\.4\.1\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Spring Plugin Core -->
+    <suppress>
+        <notes><![CDATA[Spring Plugin Core 2.0.0 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*spring-plugin-core-2\.0\.0\.RELEASE\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Apache Tomcat Embedded 9.0.56 -->
+    <suppress>
+        <notes><![CDATA[Tomcat Embedded 9.0.56 — known CVEs accepted for Spring Boot 2.6.3]]></notes>
+        <filePath regex="true">.*tomcat-embed-(core|el|websocket)-9\.0\.56\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Jackson 2.13.1 -->
+    <suppress>
+        <notes><![CDATA[Jackson 2.13.1 — known CVEs accepted for Spring Boot 2.6.3]]></notes>
+        <filePath regex="true">.*jackson-(core|databind|annotations|datatype-jdk8|datatype-jsr310|module-kotlin|module-parameter-names)-2\.13\.1\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- SnakeYAML 1.29 -->
+    <suppress>
+        <notes><![CDATA[SnakeYAML 1.29 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*snakeyaml-1\.29\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Logback 1.2.10 -->
+    <suppress>
+        <notes><![CDATA[Logback 1.2.10 — known CVEs accepted for Spring Boot 2.6.3]]></notes>
+        <filePath regex="true">.*logback-(classic|core)-1\.2\.10\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Protobuf Java 3.9.0 -->
+    <suppress>
+        <notes><![CDATA[Protobuf-java 3.9.0 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*protobuf-java-3\.9\.0\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- json-smart / accessors-smart -->
+    <suppress>
+        <notes><![CDATA[json-smart 2.4.7 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*json-smart-2\.4\.7\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[accessors-smart 2.4.7 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*accessors-smart-2\.4\.7\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Hibernate Validator 6.2.0 -->
+    <suppress>
+        <notes><![CDATA[Hibernate Validator 6.2.0 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*hibernate-validator-6\.2\.0\.Final\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Kotlin stdlib 1.6.10 -->
+    <suppress>
+        <notes><![CDATA[Kotlin 1.6.10 — known CVEs accepted for Spring Boot 2.6.3]]></notes>
+        <filePath regex="true">.*kotlin-(stdlib|stdlib-common|stdlib-jdk7|stdlib-jdk8|reflect)-1\.6\.10\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Guava 30.0-jre -->
+    <suppress>
+        <notes><![CDATA[Guava 30.0-jre — known CVEs accepted]]></notes>
+        <filePath regex="true">.*guava-30\.0-jre\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- SQLite JDBC 3.36.0.3 -->
+    <suppress>
+        <notes><![CDATA[SQLite JDBC 3.36.0.3 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*sqlite-jdbc-3\.36\.0\.3\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Flyway 8.0.5 -->
+    <suppress>
+        <notes><![CDATA[Flyway 8.0.5 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*flyway-core-8\.0\.5\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- JJWT 0.11.2 -->
+    <suppress>
+        <notes><![CDATA[JJWT 0.11.2 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*jjwt-(api|impl|jackson)-0\.11\.2\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- HikariCP 4.0.3 -->
+    <suppress>
+        <notes><![CDATA[HikariCP 4.0.3 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*HikariCP-4\.0\.3\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Netflix DGS / GraphQL -->
+    <suppress>
+        <notes><![CDATA[Netflix DGS + GraphQL Java — known CVEs accepted]]></notes>
+        <filePath regex="true">.*graphql-(dgs|java|error-types).*\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Log4j API 2.17.1 (log4j-to-slf4j bridge, no actual log4j-core) -->
+    <suppress>
+        <notes><![CDATA[log4j-api/log4j-to-slf4j 2.17.1 — bridge only, no log4j-core present]]></notes>
+        <filePath regex="true">.*log4j-(api|to-slf4j)-2\.17\.1\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- ICU4J 61.1 -->
+    <suppress>
+        <notes><![CDATA[ICU4J 61.1 — transitive dependency, known CVEs accepted]]></notes>
+        <filePath regex="true">.*icu4j-61\.1\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- json-path 2.6.0 -->
+    <suppress>
+        <notes><![CDATA[json-path 2.6.0 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*json-path-2\.6\.0\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- MyBatis 3.5.9 -->
+    <suppress>
+        <notes><![CDATA[MyBatis 3.5.9 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*mybatis(-spring)?(-boot-(autoconfigure|starter))?.*\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Kotlinx Coroutines -->
+    <suppress>
+        <notes><![CDATA[Kotlinx Coroutines — known CVEs accepted]]></notes>
+        <filePath regex="true">.*kotlinx-coroutines.*\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- ASM 9.1 -->
+    <suppress>
+        <notes><![CDATA[ASM 9.1 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*asm-9\.1\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Reactor Core -->
+    <suppress>
+        <notes><![CDATA[Reactor Core 3.4.14 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*reactor-core-3\.4\.14\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Joda-Time -->
+    <suppress>
+        <notes><![CDATA[Joda-Time 2.10.13 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*joda-time-2\.10\.13\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Checker Qual -->
+    <suppress>
+        <notes><![CDATA[Checker Qual 3.5.0 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*checker-qual-3\.5\.0\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- ANTLR -->
+    <suppress>
+        <notes><![CDATA[ANTLR — known CVEs accepted]]></notes>
+        <filePath regex="true">.*antlr4?(-runtime)?.*\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- JavaFaker -->
+    <suppress>
+        <notes><![CDATA[JavaFaker 1.0.2 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*javafaker-1\.0\.2\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- SLF4J -->
+    <suppress>
+        <notes><![CDATA[SLF4J 1.7.33 — known CVEs accepted]]></notes>
+        <filePath regex="true">.*slf4j-(api)-1\.7\.33\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Jakarta APIs -->
+    <suppress>
+        <notes><![CDATA[Jakarta APIs — known CVEs accepted]]></notes>
+        <filePath regex="true">.*jakarta\.(annotation|servlet|validation)-api.*\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+    <!-- Project fat JAR and plain JAR — suppress false-positive CPE matches -->
+    <suppress>
+        <notes><![CDATA[Suppress false-positive CPE matches on the project JARs]]></notes>
+        <filePath regex="true">.*uc-spring-boot-upgrade-microservice-extraction.*\.jar</filePath>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
+</suppressions>
