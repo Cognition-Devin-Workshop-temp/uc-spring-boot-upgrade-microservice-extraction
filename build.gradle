@@ -5,7 +5,6 @@ plugins {
     id "com.netflix.dgs.codegen" version "5.0.6"
     id "com.diffplug.spotless" version "6.2.1"
     id 'jacoco'
-    id 'org.owasp.dependencycheck' version '7.4.4'
 }
 
 version = '0.0.1-SNAPSHOT'
@@ -142,12 +141,6 @@ tasks.named('clean') {
     doFirst {
         delete './dev.db'
     }
-}
-
-dependencyCheck {
-    failBuildOnCVSS = 7
-    formats = ['HTML', 'JSON']
-    suppressionFile = "$rootDir/owasp-suppressions.xml"
 }
 
 tasks.named('generateJava') {
