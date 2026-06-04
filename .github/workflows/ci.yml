@@ -86,7 +86,7 @@ jobs:
 
       - name: Install OWASP Dependency-Check
         run: |
-          DC_VERSION="12.1.1"
+          DC_VERSION="12.1.0"
           wget -q "https://github.com/jeremylong/DependencyCheck/releases/download/v${DC_VERSION}/dependency-check-${DC_VERSION}-release.zip"
           unzip -q "dependency-check-${DC_VERSION}-release.zip"
 
