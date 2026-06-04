@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.infrastructure.mybatis.readservice.ArticleStatisticsReadService">
+    <resultMap id="articleStatsData" type="io.spring.application.data.ArticleStatsData">
+        <result column="slug" property="slug"/>
+        <result column="viewCount" property="viewCount"/>
+        <result column="favoriteCount" property="favoriteCount"/>
+        <result column="commentCount" property="commentCount"/>
+        <result column="daysSincePublished" property="daysSincePublished"/>
+    </resultMap>
+
+    <resultMap id="trendingArticleData" type="io.spring.application.data.TrendingArticleData">
+        <result column="slug" property="slug"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="favoriteCount" property="favoriteCount"/>
+    </resultMap>
+
+    <select id="getArticleStatsBySlug" resultMap="articleStatsData">
+        SELECT
+            A.slug AS slug,
+            0 AS viewCount,
+            COUNT(DISTINCT AF.user_id) AS favoriteCount,
+            COUNT(DISTINCT C.id) AS commentCount,
+            CAST((julianday('now') - julianday(A.created_at)) AS INTEGER) AS daysSincePublished
+        FROM articles A
+        LEFT JOIN article_favorites AF ON A.id = AF.article_id
+        LEFT JOIN comments C ON A.id = C.article_id
+        WHERE A.slug = #{slug}
+        GROUP BY A.id
+    </select>
+
+    <select id="getTrendingArticles" resultMap="trendingArticleData">
+        SELECT
+            A.slug AS slug,
+            A.title AS title,
+            A.description AS description,
+            COUNT(AF.user_id) AS favoriteCount
+        FROM articles A
+        INNER JOIN article_favorites AF ON A.id = AF.article_id
+        WHERE AF.article_id IN (
+            SELECT article_id FROM article_favorites
+            WHERE article_id IN (
+                SELECT id FROM articles WHERE created_at >= #{since}
+            )
+        )
+        AND A.created_at >= #{since}
+        GROUP BY A.id
+        ORDER BY favoriteCount DESC
+        LIMIT 10
+    </select>
+</mapper>
