@@ -2,6 +2,7 @@ package com.example.employee.service;
 
 import com.example.employee.exception.EmployeeNotFoundException;
 import com.example.employee.model.Employee;
+import com.example.employee.model.EmployeeStatus;
 import com.example.employee.repository.EmployeeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ class EmployeeServiceTest {
 
     @BeforeEach
     void setUp() {
-        employee = new Employee("John Doe", 75000.0, 30);
+        employee = new Employee("John Doe", 75000.0, 30, EmployeeStatus.NEW);
         employee.setEmployeeId(1L);
     }
 
@@ -48,6 +49,7 @@ class EmployeeServiceTest {
         assertThat(result.getEmployeeName()).isEqualTo("John Doe");
         assertThat(result.getEmployeeSalary()).isEqualTo(75000.0);
         assertThat(result.getEmployeeAge()).isEqualTo(30);
+        assertThat(result.getEmployeeStatus()).isEqualTo(EmployeeStatus.NEW);
         verify(employeeRepository, times(1)).save(any(Employee.class));
     }
 
@@ -74,7 +76,7 @@ class EmployeeServiceTest {
 
     @Test
     void getAllEmployees_shouldReturnAllEmployees() {
-        Employee employee2 = new Employee("Jane Smith", 80000.0, 28);
+        Employee employee2 = new Employee("Jane Smith", 80000.0, 28, EmployeeStatus.EXISTING);
         employee2.setEmployeeId(2L);
         when(employeeRepository.findAll()).thenReturn(Arrays.asList(employee, employee2));
 
@@ -88,7 +90,7 @@ class EmployeeServiceTest {
 
     @Test
     void updateEmployee_shouldUpdateAndReturnEmployee() {
-        Employee updatedDetails = new Employee("John Updated", 85000.0, 31);
+        Employee updatedDetails = new Employee("John Updated", 85000.0, 31, EmployeeStatus.EXISTING);
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
         when(employeeRepository.save(any(Employee.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -97,13 +99,14 @@ class EmployeeServiceTest {
         assertThat(result.getEmployeeName()).isEqualTo("John Updated");
         assertThat(result.getEmployeeSalary()).isEqualTo(85000.0);
         assertThat(result.getEmployeeAge()).isEqualTo(31);
+        assertThat(result.getEmployeeStatus()).isEqualTo(EmployeeStatus.EXISTING);
         verify(employeeRepository, times(1)).findById(1L);
         verify(employeeRepository, times(1)).save(any(Employee.class));
     }
 
     @Test
     void updateEmployee_shouldThrowException_whenNotFound() {
-        Employee updatedDetails = new Employee("John Updated", 85000.0, 31);
+        Employee updatedDetails = new Employee("John Updated", 85000.0, 31, EmployeeStatus.EXISTING);
         when(employeeRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> employeeService.updateEmployee(99L, updatedDetails))

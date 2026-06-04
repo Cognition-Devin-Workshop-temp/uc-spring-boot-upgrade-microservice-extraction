@@ -2,6 +2,8 @@ package com.example.employee.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,13 +35,19 @@ public class Employee {
     @Column(nullable = false)
     private Integer employeeAge;
 
+    @NotNull(message = "Employee status is required")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EmployeeStatus employeeStatus;
+
     public Employee() {
     }
 
-    public Employee(String employeeName, Double employeeSalary, Integer employeeAge) {
+    public Employee(String employeeName, Double employeeSalary, Integer employeeAge, EmployeeStatus employeeStatus) {
         this.employeeName = employeeName;
         this.employeeSalary = employeeSalary;
         this.employeeAge = employeeAge;
+        this.employeeStatus = employeeStatus;
     }
 
     public Long getEmployeeId() {
@@ -72,5 +80,13 @@ public class Employee {
 
     public void setEmployeeAge(Integer employeeAge) {
         this.employeeAge = employeeAge;
+    }
+
+    public EmployeeStatus getEmployeeStatus() {
+        return employeeStatus;
+    }
+
+    public void setEmployeeStatus(EmployeeStatus employeeStatus) {
+        this.employeeStatus = employeeStatus;
     }
 }

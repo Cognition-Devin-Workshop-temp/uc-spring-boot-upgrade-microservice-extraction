@@ -19,6 +19,7 @@ A RESTful microservice for Employee CRUD operations built with Spring Boot 3.4.1
 | `employeeName`   | String  | Employee's full name | Required, non-blank        |
 | `employeeSalary` | Double  | Employee's salary    | Required, must be positive |
 | `employeeAge`    | Integer | Employee's age       | Required, minimum 18       |
+| `employeeStatus` | Enum    | Employee's status    | Required: OUTDATED, NEW, EXISTING |
 
 ## API Endpoints
 
@@ -62,7 +63,8 @@ mvn test
 {
     "employeeName": "John Doe",
     "employeeSalary": 75000.00,
-    "employeeAge": 30
+    "employeeAge": 30,
+    "employeeStatus": "NEW"
 }
 ```
 
@@ -72,7 +74,8 @@ mvn test
     "employeeId": 1,
     "employeeName": "John Doe",
     "employeeSalary": 75000.00,
-    "employeeAge": 30
+    "employeeAge": 30,
+    "employeeStatus": "NEW"
 }
 ```
 
@@ -80,7 +83,7 @@ mvn test
 ```bash
 curl -X POST http://localhost:8080/api/employees \
   -H "Content-Type: application/json" \
-  -d '{"employeeName": "John Doe", "employeeSalary": 75000.00, "employeeAge": 30}'
+  -d '{"employeeName": "John Doe", "employeeSalary": 75000.00, "employeeAge": 30, "employeeStatus": "NEW"}'
 ```
 
 ### 2. Get Employee by ID (GET /api/employees/1)
@@ -91,7 +94,8 @@ curl -X POST http://localhost:8080/api/employees \
     "employeeId": 1,
     "employeeName": "John Doe",
     "employeeSalary": 75000.00,
-    "employeeAge": 30
+    "employeeAge": 30,
+    "employeeStatus": "NEW"
 }
 ```
 
@@ -109,13 +113,15 @@ curl http://localhost:8080/api/employees/1
         "employeeId": 1,
         "employeeName": "John Doe",
         "employeeSalary": 75000.00,
-        "employeeAge": 30
+        "employeeAge": 30,
+        "employeeStatus": "NEW"
     },
     {
         "employeeId": 2,
         "employeeName": "Jane Smith",
         "employeeSalary": 85000.00,
-        "employeeAge": 28
+        "employeeAge": 28,
+        "employeeStatus": "EXISTING"
     }
 ]
 ```
@@ -132,7 +138,8 @@ curl http://localhost:8080/api/employees
 {
     "employeeName": "John Doe Updated",
     "employeeSalary": 85000.00,
-    "employeeAge": 31
+    "employeeAge": 31,
+    "employeeStatus": "EXISTING"
 }
 ```
 
@@ -142,7 +149,8 @@ curl http://localhost:8080/api/employees
     "employeeId": 1,
     "employeeName": "John Doe Updated",
     "employeeSalary": 85000.00,
-    "employeeAge": 31
+    "employeeAge": 31,
+    "employeeStatus": "EXISTING"
 }
 ```
 
@@ -150,7 +158,7 @@ curl http://localhost:8080/api/employees
 ```bash
 curl -X PUT http://localhost:8080/api/employees/1 \
   -H "Content-Type: application/json" \
-  -d '{"employeeName": "John Doe Updated", "employeeSalary": 85000.00, "employeeAge": 31}'
+  -d '{"employeeName": "John Doe Updated", "employeeSalary": 85000.00, "employeeAge": 31, "employeeStatus": "EXISTING"}'
 ```
 
 ### 5. Delete Employee (DELETE /api/employees/1)
@@ -183,7 +191,8 @@ curl -X DELETE http://localhost:8080/api/employees/1
     "errors": {
         "employeeName": "Employee name is required",
         "employeeSalary": "Salary must be positive",
-        "employeeAge": "Age must be at least 18"
+        "employeeAge": "Age must be at least 18",
+        "employeeStatus": "Employee status is required"
     }
 }
 ```

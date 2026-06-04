@@ -35,6 +35,7 @@ public class EmployeeService {
         employee.setEmployeeName(employeeDetails.getEmployeeName());
         employee.setEmployeeSalary(employeeDetails.getEmployeeSalary());
         employee.setEmployeeAge(employeeDetails.getEmployeeAge());
+        employee.setEmployeeStatus(employeeDetails.getEmployeeStatus());
         return employeeRepository.save(employee);
     }
 

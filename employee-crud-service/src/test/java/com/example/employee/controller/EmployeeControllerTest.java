@@ -2,6 +2,7 @@ package com.example.employee.controller;
 
 import com.example.employee.exception.EmployeeNotFoundException;
 import com.example.employee.model.Employee;
+import com.example.employee.model.EmployeeStatus;
 import com.example.employee.service.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,7 @@ class EmployeeControllerTest {
 
     @BeforeEach
     void setUp() {
-        employee = new Employee("John Doe", 75000.0, 30);
+        employee = new Employee("John Doe", 75000.0, 30, EmployeeStatus.NEW);
         employee.setEmployeeId(1L);
     }
 
@@ -62,12 +63,13 @@ class EmployeeControllerTest {
                 .andExpect(jsonPath("$.employeeId", is(1)))
                 .andExpect(jsonPath("$.employeeName", is("John Doe")))
                 .andExpect(jsonPath("$.employeeSalary", is(75000.0)))
-                .andExpect(jsonPath("$.employeeAge", is(30)));
+                .andExpect(jsonPath("$.employeeAge", is(30)))
+                .andExpect(jsonPath("$.employeeStatus", is("NEW")));
     }
 
     @Test
     void createEmployee_shouldReturnBadRequest_whenNameIsBlank() throws Exception {
-        Employee invalid = new Employee("", 75000.0, 30);
+        Employee invalid = new Employee("", 75000.0, 30, EmployeeStatus.NEW);
 
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +80,7 @@ class EmployeeControllerTest {
 
     @Test
     void createEmployee_shouldReturnBadRequest_whenSalaryIsNegative() throws Exception {
-        Employee invalid = new Employee("John Doe", -1000.0, 30);
+        Employee invalid = new Employee("John Doe", -1000.0, 30, EmployeeStatus.NEW);
 
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -89,7 +91,7 @@ class EmployeeControllerTest {
 
     @Test
     void createEmployee_shouldReturnBadRequest_whenAgeIsBelow18() throws Exception {
-        Employee invalid = new Employee("John Doe", 75000.0, 15);
+        Employee invalid = new Employee("John Doe", 75000.0, 15, EmployeeStatus.NEW);
 
         mockMvc.perform(post("/api/employees")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -107,7 +109,8 @@ class EmployeeControllerTest {
                 .andExpect(jsonPath("$.employeeId", is(1)))
                 .andExpect(jsonPath("$.employeeName", is("John Doe")))
                 .andExpect(jsonPath("$.employeeSalary", is(75000.0)))
-                .andExpect(jsonPath("$.employeeAge", is(30)));
+                .andExpect(jsonPath("$.employeeAge", is(30)))
+                .andExpect(jsonPath("$.employeeStatus", is("NEW")));
     }
 
     @Test
@@ -122,7 +125,7 @@ class EmployeeControllerTest {
 
     @Test
     void getAllEmployees_shouldReturnEmployeeList() throws Exception {
-        Employee employee2 = new Employee("Jane Smith", 80000.0, 28);
+        Employee employee2 = new Employee("Jane Smith", 80000.0, 28, EmployeeStatus.EXISTING);
         employee2.setEmployeeId(2L);
         List<Employee> employees = Arrays.asList(employee, employee2);
         when(employeeService.getAllEmployees()).thenReturn(employees);
@@ -136,7 +139,7 @@ class EmployeeControllerTest {
 
     @Test
     void updateEmployee_shouldReturnUpdatedEmployee() throws Exception {
-        Employee updated = new Employee("John Updated", 85000.0, 31);
+        Employee updated = new Employee("John Updated", 85000.0, 31, EmployeeStatus.EXISTING);
         updated.setEmployeeId(1L);
         when(employeeService.updateEmployee(eq(1L), any(Employee.class))).thenReturn(updated);
 
@@ -146,12 +149,13 @@ class EmployeeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.employeeName", is("John Updated")))
                 .andExpect(jsonPath("$.employeeSalary", is(85000.0)))
-                .andExpect(jsonPath("$.employeeAge", is(31)));
+                .andExpect(jsonPath("$.employeeAge", is(31)))
+                .andExpect(jsonPath("$.employeeStatus", is("EXISTING")));
     }
 
     @Test
     void updateEmployee_shouldReturnNotFound_whenNotExists() throws Exception {
-        Employee updated = new Employee("John Updated", 85000.0, 31);
+        Employee updated = new Employee("John Updated", 85000.0, 31, EmployeeStatus.EXISTING);
         when(employeeService.updateEmployee(eq(99L), any(Employee.class)))
                 .thenThrow(new EmployeeNotFoundException("Employee not found with id: 99"));
 
@@ -164,7 +168,7 @@ class EmployeeControllerTest {
 
     @Test
     void updateEmployee_shouldReturnBadRequest_whenInvalidData() throws Exception {
-        Employee invalid = new Employee("", -100.0, 10);
+        Employee invalid = new Employee("", -100.0, 10, EmployeeStatus.NEW);
 
         mockMvc.perform(put("/api/employees/1")
                         .contentType(MediaType.APPLICATION_JSON)
