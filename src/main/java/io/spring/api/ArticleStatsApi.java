@@ -1,6 +1,10 @@
 package io.spring.api;
 
+import io.spring.api.exception.ResourceNotFoundException;
 import io.spring.application.ArticleStatsQueryService;
+import io.spring.application.data.ArticleStatsData;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +20,17 @@ public class ArticleStatsApi {
 
   @GetMapping
   public ResponseEntity<?> getArticleStats(@PathVariable("slug") String slug) {
-    // TODO: implement
-    return ResponseEntity.notFound().build();
+    return articleStatsQueryService
+        .getArticleStats(slug)
+        .map(statsData -> ResponseEntity.ok(statsResponse(statsData)))
+        .orElseThrow(ResourceNotFoundException::new);
+  }
+
+  private Map<String, Object> statsResponse(ArticleStatsData statsData) {
+    return new HashMap<String, Object>() {
+      {
+        put("stats", statsData);
+      }
+    };
   }
 }
