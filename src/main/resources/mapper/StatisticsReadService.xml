@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.infrastructure.mybatis.readservice.StatisticsReadService">
+    <select id="daysSincePublished" resultType="java.lang.Integer">
+        select cast(julianday('now') - julianday(created_at) as integer)
+        from articles where id = #{articleId}
+    </select>
+    <select id="viewCount" resultType="java.lang.Integer">
+        select coalesce(view_count, 0) from article_views where article_id = #{articleId}
+        union all select 0 where not exists (select 1 from article_views where article_id = #{articleId})
+        limit 1
+    </select>
+    <resultMap id="trendingArticleResult" type="io.spring.application.data.TrendingArticleData">
+        <result column="slug" property="slug"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="favoriteCount" property="favoriteCount"/>
+    </resultMap>
+    <select id="findTrendingArticles" resultMap="trendingArticleResult">
+        select A.slug, A.title, A.description, count(AF.user_id) as favoriteCount
+        from articles A
+        inner join article_favorites AF on A.id = AF.article_id
+        where AF.created_at >= datetime('now', '-7 days')
+        group by A.id
+        order by favoriteCount desc
+        limit 10
+    </select>
+</mapper>
