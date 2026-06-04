@@ -5,6 +5,7 @@ plugins {
     id "com.netflix.dgs.codegen" version "5.0.6"
     id "com.diffplug.spotless" version "6.2.1"
     id 'jacoco'
+    id 'org.owasp.dependencycheck' version '8.4.3'
 }
 
 version = '0.0.1-SNAPSHOT'
@@ -94,6 +95,30 @@ tasks.named('test') {
 	// Exclude Selenium tests from JUnit test task
 	exclude 'io/spring/selenium/**'
 	finalizedBy jacocoTestReport
+}
+
+// Unit tests — plain JUnit tests with no Spring context
+tasks.register('unitTest', Test) {
+    description = 'Run unit tests'
+    group = 'verification'
+    useJUnitPlatform()
+    include 'io/spring/core/**'
+    exclude 'io/spring/selenium/**'
+}
+
+// Integration tests — tests that require Spring context (API, DB, application layer)
+tasks.register('integrationTest', Test) {
+    description = 'Run integration tests'
+    group = 'verification'
+    useJUnitPlatform()
+    include 'io/spring/api/**', 'io/spring/application/**', 'io/spring/infrastructure/**', 'io/spring/RealworldApplicationTests*'
+    exclude 'io/spring/selenium/**'
+    finalizedBy jacocoTestReport
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 7.0f
+    formats = ['HTML', 'JSON']
 }
 
 // Separate task for Selenium E2E tests using TestNG
