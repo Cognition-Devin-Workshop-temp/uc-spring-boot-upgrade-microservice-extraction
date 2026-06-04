@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.infrastructure.mybatis.readservice.ArticleStatisticsReadService">
+    <resultMap id="articleStatsResult" type="io.spring.application.data.ArticleStatsData">
+        <result column="slug" property="slug"/>
+        <result column="title" property="title"/>
+        <result column="viewCount" property="viewCount"/>
+        <result column="favoriteCount" property="favoriteCount"/>
+        <result column="commentCount" property="commentCount"/>
+        <result column="daysSincePublished" property="daysSincePublished"/>
+    </resultMap>
+
+    <resultMap id="trendingArticleResult" type="io.spring.application.data.TrendingArticleData">
+        <result column="slug" property="slug"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="authorUsername" property="authorUsername"/>
+        <result column="favoriteCount" property="favoriteCount"/>
+    </resultMap>
+
+    <select id="getArticleStatsBySlug" resultMap="articleStatsResult">
+        SELECT
+            A.slug,
+            A.title,
+            0 AS viewCount,
+            (SELECT COUNT(1) FROM article_favorites AF WHERE AF.article_id = A.id) AS favoriteCount,
+            (SELECT COUNT(1) FROM comments C WHERE C.article_id = A.id) AS commentCount,
+            CAST(julianday('now') - julianday(A.created_at) AS INTEGER) AS daysSincePublished
+        FROM articles A
+        WHERE A.slug = #{slug}
+    </select>
+
+    <select id="getTrendingArticles" resultMap="trendingArticleResult">
+        SELECT
+            A.slug,
+            A.title,
+            A.description,
+            U.username AS authorUsername,
+            COUNT(AF.user_id) AS favoriteCount
+        FROM articles A
+        INNER JOIN article_favorites AF ON AF.article_id = A.id
+        LEFT JOIN users U ON U.id = A.user_id
+        WHERE A.created_at >= #{since}
+        GROUP BY A.id
+        ORDER BY favoriteCount DESC
+        LIMIT 10
+    </select>
+</mapper>

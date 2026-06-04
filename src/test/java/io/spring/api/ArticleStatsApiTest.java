@@ -1,6 +1,5 @@
 package io.spring.api;
 
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,11 +39,9 @@ public class ArticleStatsApiTest extends TestWithCurrentUser {
   @Test
   public void should_get_article_stats_success() throws Exception {
     String slug = "test-article";
-    ArticleStatsData stats =
-        new ArticleStatsData(slug, "Test Article", 150, 10, 5, 3);
+    ArticleStatsData stats = new ArticleStatsData(slug, "Test Article", 150, 10, 5, 3);
 
-    when(articleStatisticsQueryService.getArticleStats(eq(slug)))
-        .thenReturn(Optional.of(stats));
+    when(articleStatisticsQueryService.getArticleStats(eq(slug))).thenReturn(Optional.of(stats));
 
     RestAssuredMockMvc.when()
         .get("/articles/{slug}/stats", slug)
@@ -72,11 +69,9 @@ public class ArticleStatsApiTest extends TestWithCurrentUser {
   @Test
   public void should_get_article_stats_with_zero_counts() throws Exception {
     String slug = "brand-new-article";
-    ArticleStatsData stats =
-        new ArticleStatsData(slug, "Brand New Article", 0, 0, 0, 0);
+    ArticleStatsData stats = new ArticleStatsData(slug, "Brand New Article", 0, 0, 0, 0);
 
-    when(articleStatisticsQueryService.getArticleStats(eq(slug)))
-        .thenReturn(Optional.of(stats));
+    when(articleStatisticsQueryService.getArticleStats(eq(slug))).thenReturn(Optional.of(stats));
 
     RestAssuredMockMvc.when()
         .get("/articles/{slug}/stats", slug)
@@ -113,8 +108,7 @@ public class ArticleStatsApiTest extends TestWithCurrentUser {
 
   @Test
   public void should_return_empty_list_when_no_trending_articles() throws Exception {
-    when(articleStatisticsQueryService.getTrendingArticles())
-        .thenReturn(Collections.emptyList());
+    when(articleStatisticsQueryService.getTrendingArticles()).thenReturn(Collections.emptyList());
 
     RestAssuredMockMvc.when()
         .get("/stats/trending")
