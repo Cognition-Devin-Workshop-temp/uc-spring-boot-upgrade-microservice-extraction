@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.spring.infrastructure.mybatis.readservice.TagReadService">
+    <resultMap id="tag" type="io.spring.core.article.Tag">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+
     <select id="all" resultType="string">
         select name from tags
+    </select>
+
+    <select id="allTags" resultMap="tag">
+        select id, name from tags order by name
+    </select>
+
+    <select id="findById" resultMap="tag">
+        select id, name from tags where id = #{id}
     </select>
 </mapper>
