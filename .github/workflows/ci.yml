@@ -52,12 +52,57 @@ jobs:
           name: jacoco-coverage-report
           path: build/reports/jacoco/test/html/
 
+  owasp-dependency-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build to resolve dependencies
+        run: ./gradlew assemble --no-daemon
+
+      - name: Cache OWASP Dependency-Check data
+        uses: actions/cache@v4
+        with:
+          path: ~/.dependency-check
+          key: ${{ runner.os }}-owasp-dc-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-owasp-dc-
+
       - name: Run OWASP Dependency-Check
-        run: ./gradlew dependencyCheckAnalyze --no-daemon
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'uc-spring-boot-upgrade-microservice-extraction'
+          path: '.'
+          format: 'HTML'
+          args: >-
+            --failOnCVSS 7
+            --scan ./build/libs/*.jar
+            --enableExperimental
 
       - name: Upload OWASP Dependency-Check Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: owasp-dependency-check-report
-          path: build/reports/dependency-check-report.*
+          path: reports/
