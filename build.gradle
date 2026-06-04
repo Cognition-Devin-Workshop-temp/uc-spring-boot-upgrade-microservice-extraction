@@ -5,6 +5,7 @@ plugins {
     id "com.netflix.dgs.codegen" version "5.0.6"
     id "com.diffplug.spotless" version "6.2.1"
     id 'jacoco'
+    id 'org.owasp.dependencycheck' version '7.4.4'
 }
 
 version = '0.0.1-SNAPSHOT'
@@ -96,6 +97,26 @@ tasks.named('test') {
 	finalizedBy jacocoTestReport
 }
 
+// Unit tests: core logic and API layer (mock-based)
+tasks.register('unitTest', Test) {
+	description = 'Run unit tests'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/core/**', 'io/spring/api/**'
+	exclude 'io/spring/selenium/**'
+	finalizedBy jacocoTestReport
+}
+
+// Integration tests: DB/Spring context tests
+tasks.register('integrationTest', Test) {
+	description = 'Run integration tests'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/infrastructure/**', 'io/spring/application/**', 'io/spring/RealworldApplicationTests*'
+	exclude 'io/spring/selenium/**'
+	finalizedBy jacocoTestReport
+}
+
 // Separate task for Selenium E2E tests using TestNG
 tasks.register('seleniumTest', Test) {
 	description = 'Run Selenium E2E tests'
@@ -121,6 +142,12 @@ tasks.named('clean') {
     doFirst {
         delete './dev.db'
     }
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 7
+    formats = ['HTML', 'JSON']
+    suppressionFile = "$rootDir/owasp-suppressions.xml"
 }
 
 tasks.named('generateJava') {
