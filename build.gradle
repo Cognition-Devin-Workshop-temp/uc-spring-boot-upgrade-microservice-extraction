@@ -5,7 +5,6 @@ plugins {
     id "com.netflix.dgs.codegen" version "5.0.6"
     id "com.diffplug.spotless" version "6.2.1"
     id 'jacoco'
-    id 'org.owasp.dependencycheck' version '7.4.4'
 }
 
 version = '0.0.1-SNAPSHOT'
@@ -152,12 +151,6 @@ tasks.register('jacocoFullReport', JacocoReport) {
         html.required = true
         csv.required = false
     }
-}
-
-// OWASP Dependency-Check configuration
-dependencyCheck {
-    failBuildOnCVSS = 7.0
-    formats = ['HTML', 'JSON']
 }
 
 tasks.named('clean') {

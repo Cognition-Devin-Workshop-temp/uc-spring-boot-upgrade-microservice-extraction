@@ -174,23 +174,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Cache OWASP Dependency-Check data
-        uses: actions/cache@v4
-        with:
-          path: ~/.gradle/dependency-check-data
-          key: ${{ runner.os }}-owasp-dc-${{ github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-owasp-dc-
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Build project for dependency analysis
+        run: ./gradlew build -x test -x jacocoTestReport -x jacocoTestCoverageVerification
+
       - name: Run OWASP Dependency-Check
-        run: ./gradlew dependencyCheckAnalyze
+        uses: dependency-check/Dependency-Check_Action@main
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME }}
+        with:
+          project: uc-spring-boot-upgrade-microservice-extraction
+          path: .
+          format: HTML
+          args: >-
+            --failOnCVSS 7
 
       - name: Upload OWASP Dependency-Check report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: owasp-dependency-check-report
-          path: build/reports/dependency-check-report.*
+          path: reports/
