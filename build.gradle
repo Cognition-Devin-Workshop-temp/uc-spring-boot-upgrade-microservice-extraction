@@ -103,7 +103,6 @@ tasks.register('unitTest', Test) {
 	useJUnitPlatform()
 	include 'io/spring/core/**', 'io/spring/api/**'
 	exclude 'io/spring/selenium/**'
-	finalizedBy jacocoTestReport
 }
 
 // Integration tests: DB/Spring context tests
@@ -113,7 +112,6 @@ tasks.register('integrationTest', Test) {
 	useJUnitPlatform()
 	include 'io/spring/infrastructure/**', 'io/spring/application/**', 'io/spring/RealworldApplicationTests*'
 	exclude 'io/spring/selenium/**'
-	finalizedBy jacocoTestReport
 }
 
 // Separate task for Selenium E2E tests using TestNG
