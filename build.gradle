@@ -117,6 +117,19 @@ tasks.register('seleniumTest', Test) {
 	ignoreFailures = false
 }
 
+// Playwright E2E tests (Python) — replaces seleniumTest for the migrated framework
+tasks.register('playwrightTest', Exec) {
+	description = 'Run Playwright E2E tests (Python)'
+	group = 'verification'
+
+	workingDir = projectDir
+	commandLine 'bash', '-c', '''
+		pip install -q -r playwright_tests/requirements.txt && \
+		playwright install --with-deps chromium && \
+		pytest --rootdir=. -c playwright_tests/pytest.ini
+	'''
+}
+
 tasks.named('clean') {
     doFirst {
         delete './dev.db'
