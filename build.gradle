@@ -5,6 +5,7 @@ plugins {
     id "com.netflix.dgs.codegen" version "5.0.6"
     id "com.diffplug.spotless" version "6.2.1"
     id 'jacoco'
+    id 'info.solidsoft.pitest' version '1.7.4'
 }
 
 version = '0.0.1-SNAPSHOT'
@@ -133,4 +134,15 @@ tasks.named('bootRun') {
     doFirst {
         delete './dev.db'
     }
+}
+
+pitest {
+    targetClasses = ['io.spring.core.article.*', 'io.spring.application.article.*']
+    targetTests = ['io.spring.*']
+    excludedTestClasses = ['io.spring.selenium.*', 'io.spring.infrastructure.article.ArticleRepositoryTransactionTest']
+    mutators = ['DEFAULTS']
+    outputFormats = ['HTML', 'XML']
+    timestampedReports = false
+    threads = 4
+    junit5PluginVersion = '0.15'
 }
