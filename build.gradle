@@ -27,6 +27,7 @@ jacoco {
 
 jacocoTestReport {
     dependsOn test
+    executionData fileTree(buildDir).include('jacoco/*.exec')
     reports {
         xml.required = true
         html.required = true
@@ -92,6 +93,25 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 	// Exclude Selenium tests from JUnit test task
+	exclude 'io/spring/selenium/**'
+	finalizedBy jacocoTestReport
+}
+
+// Unit tests (core domain + application services)
+tasks.register('unitTest', Test) {
+	description = 'Run unit tests'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/core/**', 'io/spring/application/**'
+	exclude 'io/spring/selenium/**'
+}
+
+// Integration tests (API endpoints + infrastructure/repository)
+tasks.register('integrationTest', Test) {
+	description = 'Run integration tests'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/api/**', 'io/spring/infrastructure/**'
 	exclude 'io/spring/selenium/**'
 	finalizedBy jacocoTestReport
 }
