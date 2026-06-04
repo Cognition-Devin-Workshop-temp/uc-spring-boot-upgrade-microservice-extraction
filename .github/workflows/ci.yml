@@ -160,16 +160,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
       - name: Cache OWASP NVD data
         uses: actions/cache@v4
         with:
@@ -178,20 +168,28 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-owasp-nvd-
 
+      - name: Install OWASP Dependency-Check CLI
+        run: |
+          DC_VERSION="10.0.4"
+          wget -q "https://github.com/jeremylong/DependencyCheck/releases/download/v${DC_VERSION}/dependency-check-${DC_VERSION}-release.zip"
+          unzip -q "dependency-check-${DC_VERSION}-release.zip"
+          chmod +x dependency-check/bin/dependency-check.sh
+
       - name: Run OWASP Dependency-Check (fails on CVSS >= 7.0)
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: 'uc-spring-boot-upgrade-microservice-extraction'
-          path: '.'
-          format: 'HTML'
-          args: >
-            --failOnCVSS 7
-            --suppression owasp-suppressions.xml
-            --data ${{ github.workspace }}/dependency-check-data
+        run: |
+          ./dependency-check/bin/dependency-check.sh \
+            --project "uc-spring-boot-upgrade-microservice-extraction" \
+            --scan "." \
+            --format HTML \
+            --format JSON \
+            --failOnCVSS 7 \
+            --suppression owasp-suppressions.xml \
+            --data "${{ github.workspace }}/dependency-check-data" \
+            --out "${{ github.workspace }}/dependency-check-report"
 
       - name: Upload Dependency-Check report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
-          path: reports/
+          path: ${{ github.workspace }}/dependency-check-report/
