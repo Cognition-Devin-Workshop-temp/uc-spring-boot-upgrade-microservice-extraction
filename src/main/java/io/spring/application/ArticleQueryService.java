@@ -33,7 +33,7 @@ public class ArticleQueryService {
       return Optional.empty();
     } else {
       if (user != null) {
-        fillExtraInfo(id, user, articleData);
+        populateFavoritesAndFollowing(id, user, articleData);
       }
       return Optional.of(articleData);
     }
@@ -45,7 +45,7 @@ public class ArticleQueryService {
       return Optional.empty();
     } else {
       if (user != null) {
-        fillExtraInfo(articleData.getId(), user, articleData);
+        populateFavoritesAndFollowing(articleData.getId(), user, articleData);
       }
       return Optional.of(articleData);
     }
@@ -71,7 +71,7 @@ public class ArticleQueryService {
       }
 
       List<ArticleData> articles = articleReadService.findArticles(articleIds);
-      fillExtraInfo(articles, currentUser);
+      populateFavoritesAndFollowing(articles, currentUser);
 
       return new CursorPager<>(articles, page.getDirection(), hasExtra);
     }
@@ -79,12 +79,12 @@ public class ArticleQueryService {
 
   public CursorPager<ArticleData> findUserFeedWithCursor(
       User user, CursorPageParameter<DateTime> page) {
-    List<String> followdUsers = userRelationshipQueryService.followedUsers(user.getId());
-    if (followdUsers.size() == 0) {
+    List<String> followedUsers = userRelationshipQueryService.followedUsers(user.getId());
+    if (followedUsers.size() == 0) {
       return new CursorPager<>(new ArrayList<>(), page.getDirection(), false);
     } else {
       List<ArticleData> articles =
-          articleReadService.findArticlesOfAuthorsWithCursor(followdUsers, page);
+          articleReadService.findArticlesOfAuthorsWithCursor(followedUsers, page);
       boolean hasExtra = articles.size() > page.getLimit();
       if (hasExtra) {
         articles.remove(page.getLimit());
@@ -92,7 +92,7 @@ public class ArticleQueryService {
       if (!page.isNext()) {
         Collections.reverse(articles);
       }
-      fillExtraInfo(articles, user);
+      populateFavoritesAndFollowing(articles, user);
       return new CursorPager<>(articles, page.getDirection(), hasExtra);
     }
   }
@@ -105,24 +105,24 @@ public class ArticleQueryService {
       return new ArticleDataList(new ArrayList<>(), articleCount);
     } else {
       List<ArticleData> articles = articleReadService.findArticles(articleIds);
-      fillExtraInfo(articles, currentUser);
+      populateFavoritesAndFollowing(articles, currentUser);
       return new ArticleDataList(articles, articleCount);
     }
   }
 
   public ArticleDataList findUserFeed(User user, Page page) {
-    List<String> followdUsers = userRelationshipQueryService.followedUsers(user.getId());
-    if (followdUsers.size() == 0) {
+    List<String> followedUsers = userRelationshipQueryService.followedUsers(user.getId());
+    if (followedUsers.size() == 0) {
       return new ArticleDataList(new ArrayList<>(), 0);
     } else {
-      List<ArticleData> articles = articleReadService.findArticlesOfAuthors(followdUsers, page);
-      fillExtraInfo(articles, user);
-      int count = articleReadService.countFeedSize(followdUsers);
+      List<ArticleData> articles = articleReadService.findArticlesOfAuthors(followedUsers, page);
+      populateFavoritesAndFollowing(articles, user);
+      int count = articleReadService.countFeedSize(followedUsers);
       return new ArticleDataList(articles, count);
     }
   }
 
-  private void fillExtraInfo(List<ArticleData> articles, User currentUser) {
+  private void populateFavoritesAndFollowing(List<ArticleData> articles, User currentUser) {
     setFavoriteCount(articles);
     if (currentUser != null) {
       setIsFavorite(articles, currentUser);
@@ -134,9 +134,7 @@ public class ArticleQueryService {
     Set<String> followingAuthors =
         userRelationshipQueryService.followingAuthors(
             currentUser.getId(),
-            articles.stream()
-                .map(articleData1 -> articleData1.getProfileData().getId())
-                .collect(toList()));
+            articles.stream().map(article -> article.getProfileData().getId()).collect(toList()));
     articles.forEach(
         articleData -> {
           if (followingAuthors.contains(articleData.getProfileData().getId())) {
@@ -172,7 +170,7 @@ public class ArticleQueryService {
         });
   }
 
-  private void fillExtraInfo(String id, User user, ArticleData articleData) {
+  private void populateFavoritesAndFollowing(String id, User user, ArticleData articleData) {
     articleData.setFavorited(articleFavoritesReadService.isUserFavorite(user.getId(), id));
     articleData.setFavoritesCount(articleFavoritesReadService.articleFavoriteCount(id));
     articleData
