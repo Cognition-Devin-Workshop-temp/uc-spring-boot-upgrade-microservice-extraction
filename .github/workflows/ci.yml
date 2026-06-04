@@ -84,14 +84,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Install OWASP Dependency-Check
+        run: |
+          DC_VERSION="12.1.1"
+          wget -q "https://github.com/jeremylong/DependencyCheck/releases/download/v${DC_VERSION}/dependency-check-${DC_VERSION}-release.zip"
+          unzip -q "dependency-check-${DC_VERSION}-release.zip"
+
       - name: Run OWASP Dependency-Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: 'uc-spring-boot-upgrade-microservice-extraction'
-          path: '.'
-          format: 'HTML'
-          args: >-
-            --failOnCVSS 7
+        run: |
+          ./dependency-check/bin/dependency-check.sh \
+            --project "uc-spring-boot-upgrade-microservice-extraction" \
+            --scan . \
+            --format HTML \
+            --out reports \
+            --failOnCVSS 7 \
             --enableExperimental
 
       - name: Upload Dependency-Check report
