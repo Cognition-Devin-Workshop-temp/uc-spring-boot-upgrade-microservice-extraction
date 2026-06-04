@@ -1,7 +1,0 @@
-/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/main/java/com/example/employee/EmployeeCrudServiceApplication.java
-/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/main/java/com/example/employee/controller/EmployeeController.java
-/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/main/java/com/example/employee/exception/EmployeeNotFoundException.java
-/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/main/java/com/example/employee/exception/GlobalExceptionHandler.java
-/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/main/java/com/example/employee/model/Employee.java
-/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/main/java/com/example/employee/repository/EmployeeRepository.java
-/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/main/java/com/example/employee/service/EmployeeService.java

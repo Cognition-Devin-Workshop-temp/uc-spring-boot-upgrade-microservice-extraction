@@ -1,7 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Employee CRUD Microservice,com.example.employee.model,Employee,0,43,0,0,0,19,0,10,0,10
-Employee CRUD Microservice,com.example.employee.service,EmployeeService,0,62,0,0,0,15,0,7,0,7
-Employee CRUD Microservice,com.example.employee.exception,GlobalExceptionHandler,0,88,0,0,0,16,0,4,0,4
-Employee CRUD Microservice,com.example.employee.exception,EmployeeNotFoundException,0,4,0,0,0,2,0,1,0,1
-Employee CRUD Microservice,com.example.employee.controller,EmployeeController,0,48,0,0,0,13,0,6,0,6
-Employee CRUD Microservice,com.example.employee,EmployeeCrudServiceApplication,5,3,0,0,2,1,1,1,1,1
