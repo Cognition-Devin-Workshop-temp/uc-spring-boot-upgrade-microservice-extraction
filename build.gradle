@@ -5,6 +5,7 @@ plugins {
     id "com.netflix.dgs.codegen" version "5.0.6"
     id "com.diffplug.spotless" version "6.2.1"
     id 'jacoco'
+    id 'org.owasp.dependencycheck' version '9.2.0'
 }
 
 version = '0.0.1-SNAPSHOT'
@@ -27,6 +28,7 @@ jacoco {
 
 jacocoTestReport {
     dependsOn test
+    executionData fileTree(dir: "${buildDir}/jacoco", includes: ['*.exec'])
     reports {
         xml.required = true
         html.required = true
@@ -36,12 +38,25 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
+    executionData fileTree(dir: "${buildDir}/jacoco", includes: ['*.exec'])
     violationRules {
         rule {
             limit {
                 minimum = 0.80
             }
         }
+    }
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 7.0f
+    formats = ['HTML', 'JSON']
+    // NVD API requires an API key from GitHub Actions runners.
+    // To enable full NVD scanning, add NVD_API_KEY to your GitHub repo secrets
+    // (free: https://nvd.nist.gov/developers/request-an-api-key).
+    nvd {
+        apiKey = System.getenv('NVD_API_KEY') ?: ''
+        delay = System.getenv('NVD_API_KEY') ? 2000 : 8000
     }
 }
 
@@ -94,6 +109,23 @@ tasks.named('test') {
 	// Exclude Selenium tests from JUnit test task
 	exclude 'io/spring/selenium/**'
 	finalizedBy jacocoTestReport
+}
+
+// Unit tests: core domain logic and application services
+tasks.register('unitTest', Test) {
+	description = 'Run unit tests'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/core/**', 'io/spring/application/**'
+}
+
+// Integration tests: API endpoints, repository/infrastructure, and context loading
+tasks.register('integrationTest', Test) {
+	description = 'Run integration tests'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/api/**', 'io/spring/infrastructure/**', 'io/spring/RealworldApplicationTests*'
+	exclude 'io/spring/selenium/**'
 }
 
 // Separate task for Selenium E2E tests using TestNG
