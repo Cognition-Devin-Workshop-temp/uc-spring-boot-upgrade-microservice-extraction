@@ -5,13 +5,10 @@ import io.spring.api.exception.ResourceNotFoundException;
 import io.spring.application.ArticleQueryService;
 import io.spring.application.article.ArticleCommandService;
 import io.spring.application.article.UpdateArticleParam;
-import io.spring.application.data.ArticleData;
 import io.spring.core.article.Article;
 import io.spring.core.article.ArticleRepository;
 import io.spring.core.service.AuthorizationService;
 import io.spring.core.user.User;
-import java.util.HashMap;
-import java.util.Map;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +34,7 @@ public class ArticleApi {
       @PathVariable("slug") String slug, @AuthenticationPrincipal User user) {
     return articleQueryService
         .findBySlug(slug, user)
-        .map(articleData -> ResponseEntity.ok(articleResponse(articleData)))
+        .map(articleData -> ResponseEntity.ok(ResponseWrapper.wrap("article", articleData)))
         .orElseThrow(ResourceNotFoundException::new);
   }
 
@@ -56,7 +53,8 @@ public class ArticleApi {
               Article updatedArticle =
                   articleCommandService.updateArticle(article, updateArticleParam);
               return ResponseEntity.ok(
-                  articleResponse(
+                  ResponseWrapper.wrap(
+                      "article",
                       articleQueryService.findBySlug(updatedArticle.getSlug(), user).get()));
             })
         .orElseThrow(ResourceNotFoundException::new);
@@ -76,13 +74,5 @@ public class ArticleApi {
               return ResponseEntity.noContent().build();
             })
         .orElseThrow(ResourceNotFoundException::new);
-  }
-
-  private Map<String, Object> articleResponse(ArticleData articleData) {
-    return new HashMap<String, Object>() {
-      {
-        put("article", articleData);
-      }
-    };
   }
 }
