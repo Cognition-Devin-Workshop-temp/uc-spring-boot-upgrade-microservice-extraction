@@ -1,7 +1,9 @@
 package io.spring.api;
 
+import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -14,6 +16,7 @@ import io.spring.application.data.TrendingArticleData;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.util.NestedServletException;
 
 @WebMvcTest(ArticleStatsApi.class)
 @Import({WebSecurityConfig.class, JacksonCustomizations.class})
@@ -137,5 +141,117 @@ public class ArticleStatsApiTest extends TestWithCurrentUser {
         .body("trendingArticles[0].favoriteCount", equalTo(100))
         .body("trendingArticles[1].favoriteCount", equalTo(75))
         .body("trendingArticles[2].favoriteCount", equalTo(50));
+  }
+
+  // --- Negative test cases ---
+
+  @Test
+  public void should_return_404_for_stats_with_nonexistent_numeric_slug() throws Exception {
+    String slug = "99999-nonexistent-article";
+    when(articleStatisticsQueryService.getArticleStats(eq(slug))).thenReturn(Optional.empty());
+
+    RestAssuredMockMvc.when().get("/articles/{slug}/stats", slug).then().statusCode(404);
+  }
+
+  @Test
+  public void should_return_401_when_post_to_article_stats_without_auth() throws Exception {
+    given()
+        .contentType("application/json")
+        .body("{}")
+        .when()
+        .post("/articles/{slug}/stats", "some-article")
+        .then()
+        .statusCode(401);
+  }
+
+  @Test
+  public void should_return_401_when_put_to_article_stats_without_auth() throws Exception {
+    given()
+        .contentType("application/json")
+        .body("{}")
+        .when()
+        .put("/articles/{slug}/stats", "some-article")
+        .then()
+        .statusCode(401);
+  }
+
+  @Test
+  public void should_return_401_when_delete_to_article_stats_without_auth() throws Exception {
+    given().when().delete("/articles/{slug}/stats", "some-article").then().statusCode(401);
+  }
+
+  @Test
+  public void should_return_401_when_post_to_trending_without_auth() throws Exception {
+    given()
+        .contentType("application/json")
+        .body("{}")
+        .when()
+        .post("/stats/trending")
+        .then()
+        .statusCode(401);
+  }
+
+  @Test
+  public void should_return_401_when_put_to_trending_without_auth() throws Exception {
+    given()
+        .contentType("application/json")
+        .body("{}")
+        .when()
+        .put("/stats/trending")
+        .then()
+        .statusCode(401);
+  }
+
+  @Test
+  public void should_return_401_when_delete_to_trending_without_auth() throws Exception {
+    given().when().delete("/stats/trending").then().statusCode(401);
+  }
+
+  @Test
+  public void should_get_article_stats_accessible_without_authentication() throws Exception {
+    String slug = "public-article";
+    ArticleStatsData stats = new ArticleStatsData(slug, "Public Article", 0, 5, 2, 10);
+
+    when(articleStatisticsQueryService.getArticleStats(eq(slug))).thenReturn(Optional.of(stats));
+
+    RestAssuredMockMvc.when()
+        .get("/articles/{slug}/stats", slug)
+        .then()
+        .statusCode(200)
+        .body("articleStats.slug", equalTo(slug));
+  }
+
+  @Test
+  public void should_get_trending_accessible_without_authentication() throws Exception {
+    when(articleStatisticsQueryService.getTrendingArticles()).thenReturn(Collections.emptyList());
+
+    RestAssuredMockMvc.when().get("/stats/trending").then().statusCode(200);
+  }
+
+  @Test
+  public void should_return_404_for_stats_with_very_long_slug() throws Exception {
+    String longSlug = "a".repeat(1000);
+    when(articleStatisticsQueryService.getArticleStats(eq(longSlug))).thenReturn(Optional.empty());
+
+    RestAssuredMockMvc.when().get("/articles/{slug}/stats", longSlug).then().statusCode(404);
+  }
+
+  @Test
+  public void should_propagate_exception_when_article_stats_service_fails() throws Exception {
+    when(articleStatisticsQueryService.getArticleStats(any()))
+        .thenThrow(new RuntimeException("Database error"));
+
+    Assertions.assertThrows(
+        NestedServletException.class,
+        () -> RestAssuredMockMvc.when().get("/articles/{slug}/stats", "error-article"));
+  }
+
+  @Test
+  public void should_propagate_exception_when_trending_service_fails() throws Exception {
+    when(articleStatisticsQueryService.getTrendingArticles())
+        .thenThrow(new RuntimeException("Database error"));
+
+    Assertions.assertThrows(
+        NestedServletException.class, () -> RestAssuredMockMvc.when().get("/stats/trending"));
   }
 }
