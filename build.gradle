@@ -5,6 +5,7 @@ plugins {
     id "com.netflix.dgs.codegen" version "5.0.6"
     id "com.diffplug.spotless" version "6.2.1"
     id 'jacoco'
+    id 'org.owasp.dependencycheck' version '7.4.4'
 }
 
 version = '0.0.1-SNAPSHOT'
@@ -115,6 +116,48 @@ tasks.register('seleniumTest', Test) {
 	
 	// Don't fail the build on test failures (for CI reporting)
 	ignoreFailures = false
+}
+
+// Unit tests — pure domain logic, no Spring context
+tasks.register('unitTest', Test) {
+    description = 'Run unit tests'
+    group = 'verification'
+    useJUnitPlatform()
+    include 'io/spring/core/**'
+    exclude 'io/spring/selenium/**'
+}
+
+// Integration tests — Spring context required (API, repository, application, smoke)
+tasks.register('integrationTest', Test) {
+    description = 'Run integration tests'
+    group = 'verification'
+    useJUnitPlatform()
+    include 'io/spring/api/**'
+    include 'io/spring/infrastructure/**'
+    include 'io/spring/application/**'
+    include 'io/spring/RealworldApplicationTests*'
+    exclude 'io/spring/selenium/**'
+}
+
+// Aggregated JaCoCo report from both unit and integration tests
+tasks.register('jacocoFullReport', JacocoReport) {
+    description = 'Generates aggregated JaCoCo coverage report'
+    group = 'verification'
+    dependsOn 'unitTest', 'integrationTest'
+    executionData fileTree(dir: "${buildDir}/jacoco", includes: ['unitTest.exec', 'integrationTest.exec'])
+    sourceDirectories.from = sourceSets.main.java.srcDirs
+    classDirectories.from = sourceSets.main.output
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+// OWASP Dependency-Check configuration
+dependencyCheck {
+    failBuildOnCVSS = 7.0
+    formats = ['HTML', 'JSON']
 }
 
 tasks.named('clean') {
