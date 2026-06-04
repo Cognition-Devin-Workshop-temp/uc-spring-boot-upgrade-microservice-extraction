@@ -50,8 +50,10 @@ jacocoTestCoverageVerification {
 
 dependencyCheck {
     failBuildOnCVSS = 7.0f
-    failOnError = false
     formats = ['HTML', 'JSON']
+    // NVD API requires an API key from GitHub Actions runners.
+    // To enable full NVD scanning, add NVD_API_KEY to your GitHub repo secrets
+    // (free: https://nvd.nist.gov/developers/request-an-api-key).
     nvd {
         apiKey = System.getenv('NVD_API_KEY') ?: ''
         delay = System.getenv('NVD_API_KEY') ? 2000 : 8000
