@@ -41,7 +41,7 @@ public class ArticleStatsApiTest extends TestWithCurrentUser {
     when(articleStatsQueryService.getArticleStats(eq(slug))).thenReturn(Optional.of(statsData));
 
     RestAssuredMockMvc.when()
-        .get("/api/articles/{slug}/stats", slug)
+        .get("/articles/{slug}/stats", slug)
         .then()
         .statusCode(200)
         .body("stats.slug", equalTo(slug))
@@ -57,7 +57,7 @@ public class ArticleStatsApiTest extends TestWithCurrentUser {
         .thenReturn(Optional.empty());
 
     RestAssuredMockMvc.when()
-        .get("/api/articles/{slug}/stats", "non-existent-slug")
+        .get("/articles/{slug}/stats", "non-existent-slug")
         .then()
         .statusCode(404);
   }
@@ -70,7 +70,7 @@ public class ArticleStatsApiTest extends TestWithCurrentUser {
     when(articleStatsQueryService.getArticleStats(eq(slug))).thenReturn(Optional.of(statsData));
 
     RestAssuredMockMvc.when()
-        .get("/api/articles/{slug}/stats", slug)
+        .get("/articles/{slug}/stats", slug)
         .then()
         .statusCode(200)
         .body("stats.favoriteCount", equalTo(0))

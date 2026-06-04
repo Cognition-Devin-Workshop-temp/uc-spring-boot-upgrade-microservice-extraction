@@ -53,7 +53,7 @@ public class TrendingApiTest extends TestWithCurrentUser {
     when(articleStatsQueryService.getTrendingArticles(eq(10), eq(7))).thenReturn(trending);
 
     RestAssuredMockMvc.when()
-        .get("/api/stats/trending")
+        .get("/stats/trending")
         .then()
         .statusCode(200)
         .body("articles", hasSize(2))
@@ -68,7 +68,7 @@ public class TrendingApiTest extends TestWithCurrentUser {
     when(articleStatsQueryService.getTrendingArticles(eq(10), eq(7))).thenReturn(new ArrayList<>());
 
     RestAssuredMockMvc.when()
-        .get("/api/stats/trending")
+        .get("/stats/trending")
         .then()
         .statusCode(200)
         .body("articles", hasSize(0));
@@ -89,7 +89,7 @@ public class TrendingApiTest extends TestWithCurrentUser {
     when(articleStatsQueryService.getTrendingArticles(eq(10), eq(7))).thenReturn(trending);
 
     RestAssuredMockMvc.when()
-        .get("/api/stats/trending")
+        .get("/stats/trending")
         .then()
         .statusCode(200)
         .body("articles", hasSize(10));

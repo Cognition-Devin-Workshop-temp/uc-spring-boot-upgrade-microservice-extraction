@@ -10,6 +10,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
+import org.joda.time.format.DateTimeParser;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,7 +31,11 @@ public class ArticleStatsQueryServiceImpl implements ArticleStatsQueryService {
 
     long daysSincePublished = 0;
     if (createdAtStr != null) {
-      DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+      DateTimeParser[] parsers = {
+        DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").getParser(),
+        DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").getParser()
+      };
+      DateTimeFormatter fmt = new DateTimeFormatterBuilder().append(null, parsers).toFormatter();
       DateTime createdAt = fmt.parseDateTime(createdAtStr);
       daysSincePublished =
           Days.daysBetween(createdAt.toLocalDate(), new DateTime().toLocalDate()).getDays();
