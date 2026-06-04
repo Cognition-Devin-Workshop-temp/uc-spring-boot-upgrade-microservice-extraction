@@ -31,12 +31,12 @@ class BasePage:
 
     def wait_for_visible(self, locator: Locator, timeout: int | None = None) -> Locator:
         """Wait for a locator to become visible."""
-        locator.wait_for(state="visible", timeout=timeout or self.DEFAULT_TIMEOUT_MS)
+        locator.wait_for(state="visible", timeout=timeout if timeout is not None else self.DEFAULT_TIMEOUT_MS)
         return locator
 
     def wait_for_clickable(self, locator: Locator, timeout: int | None = None) -> Locator:
         """Wait for a locator to be enabled and visible (clickable)."""
-        locator.wait_for(state="visible", timeout=timeout or self.DEFAULT_TIMEOUT_MS)
+        locator.wait_for(state="visible", timeout=timeout if timeout is not None else self.DEFAULT_TIMEOUT_MS)
         return locator
 
     # ------------------------------------------------------------------
@@ -45,7 +45,7 @@ class BasePage:
 
     def click(self, locator: Locator, timeout: int | None = None) -> None:
         """Click an element after waiting for it to be actionable."""
-        locator.click(timeout=timeout or self.DEFAULT_TIMEOUT_MS)
+        locator.click(timeout=timeout if timeout is not None else self.DEFAULT_TIMEOUT_MS)
 
     def type_text(self, locator: Locator, text: str, timeout: int | None = None) -> None:
         """
@@ -53,7 +53,7 @@ class BasePage:
 
         Replaces: BasePage.type(WebElement, String)
         """
-        locator.fill(text, timeout=timeout or self.DEFAULT_TIMEOUT_MS)
+        locator.fill(text, timeout=timeout if timeout is not None else self.DEFAULT_TIMEOUT_MS)
 
     def get_text(self, locator: Locator, timeout: int | None = None) -> str:
         """

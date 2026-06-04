@@ -20,6 +20,11 @@ from typing import Generator
 import pytest
 from playwright.sync_api import Browser, BrowserContext, BrowserType, Page, Playwright, sync_playwright
 
+try:
+    from pytest_html import extras as html_extras
+except ImportError:
+    html_extras = None
+
 CONFIG_PATH = Path(__file__).parent / "config.ini"
 
 
@@ -139,4 +144,5 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
                 path = ss_dir / f"{item.name}.png"
                 page.screenshot(path=str(path))
                 if hasattr(report, "extras"):
-                    report.extras.append(pytest.html.extras.image(str(path)))
+                    if html_extras is not None:
+                        report.extras.append(html_extras.image(str(path)))
