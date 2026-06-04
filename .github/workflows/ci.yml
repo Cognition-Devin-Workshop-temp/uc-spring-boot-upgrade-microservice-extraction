@@ -188,6 +188,7 @@ jobs:
 
       - name: Run OWASP Dependency-Check
         run: |
+          mkdir -p build/reports/dependency-check
           ./dependency-check/bin/dependency-check.sh \
             --project "uc-spring-boot-upgrade-microservice-extraction" \
             --scan . \
