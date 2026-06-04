@@ -182,7 +182,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build project to resolve dependencies
-        run: ./gradlew build -x test -x jacocoTestCoverageVerification -x jacocoTestReport
+        run: ./gradlew build -x test -x jacocoTestCoverageVerification -x jacocoTestReport -x spotlessJava -x spotlessCheck
 
       - name: Install OWASP Dependency-Check CLI
         run: |
