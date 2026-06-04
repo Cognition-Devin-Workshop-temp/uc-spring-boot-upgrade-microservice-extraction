@@ -1,0 +1,217 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test -x jacocoTestCoverageVerification --no-daemon
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run unit tests
+        run: ./gradlew unitTest --no-daemon
+
+      - name: Upload unit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: build/reports/tests/unitTest/
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run integration tests
+        run: ./gradlew integrationTest -x jacocoTestCoverageVerification --no-daemon
+
+      - name: Upload integration test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: build/reports/tests/integrationTest/
+
+  jacoco-report:
+    name: JaCoCo Coverage Report
+    runs-on: ubuntu-latest
+    needs: [ unit-tests, integration-tests ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run all tests and generate JaCoCo report
+        run: ./gradlew test jacocoTestReport -x jacocoTestCoverageVerification --no-daemon
+
+      - name: Upload JaCoCo coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-coverage-report
+          path: |
+            build/reports/jacoco/test/html/
+            build/reports/jacoco/test/jacocoTestReport.xml
+
+  owasp-dependency-check:
+    name: OWASP Dependency-Check
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build project for dependency scan
+        run: ./gradlew build -x test -x jacocoTestCoverageVerification --no-daemon
+
+      - name: Cache OWASP Dependency-Check data
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/owasp-dependency-check/data
+          key: ${{ runner.os }}-owasp-data-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-owasp-data-
+
+      - name: Install OWASP Dependency-Check CLI
+        run: |
+          DC_VERSION=10.0.4
+          if [ ! -f ~/owasp-dependency-check/bin/dependency-check.sh ]; then
+            mkdir -p ~/owasp-dependency-check
+            wget -q "https://github.com/jeremylong/DependencyCheck/releases/download/v${DC_VERSION}/dependency-check-${DC_VERSION}-release.zip" -O /tmp/dc.zip
+            unzip -q -o /tmp/dc.zip -d ~/owasp-dependency-check
+            mv ~/owasp-dependency-check/dependency-check/* ~/owasp-dependency-check/
+            rmdir ~/owasp-dependency-check/dependency-check
+          fi
+
+      - name: Run OWASP Dependency-Check (fail on CVSS >= 7.0)
+        run: |
+          mkdir -p build/reports/owasp
+          ~/owasp-dependency-check/bin/dependency-check.sh \
+            --project "uc-spring-boot-upgrade-microservice-extraction" \
+            --scan . \
+            --format HTML \
+            --format JSON \
+            --failOnCVSS 7 \
+            --out build/reports/owasp \
+            --enableExperimental
+
+      - name: Upload OWASP Dependency-Check report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-dependency-check-report
+          path: build/reports/owasp/

@@ -96,6 +96,25 @@ tasks.named('test') {
 	finalizedBy jacocoTestReport
 }
 
+// Unit tests — plain JUnit tests with no Spring context
+tasks.register('unitTest', Test) {
+    description = 'Run unit tests'
+    group = 'verification'
+    useJUnitPlatform()
+    include 'io/spring/core/**'
+    exclude 'io/spring/selenium/**'
+}
+
+// Integration tests — tests that require Spring context (API, DB, application layer)
+tasks.register('integrationTest', Test) {
+    description = 'Run integration tests'
+    group = 'verification'
+    useJUnitPlatform()
+    include 'io/spring/api/**', 'io/spring/application/**', 'io/spring/infrastructure/**', 'io/spring/RealworldApplicationTests*'
+    exclude 'io/spring/selenium/**'
+    finalizedBy jacocoTestReport
+}
+
 // Separate task for Selenium E2E tests using TestNG
 tasks.register('seleniumTest', Test) {
 	description = 'Run Selenium E2E tests'
