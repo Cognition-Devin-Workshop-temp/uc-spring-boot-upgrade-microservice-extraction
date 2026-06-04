@@ -5,6 +5,7 @@ plugins {
     id "com.netflix.dgs.codegen" version "5.0.6"
     id "com.diffplug.spotless" version "6.2.1"
     id 'jacoco'
+    id 'org.owasp.dependencycheck' version '7.4.4'
 }
 
 version = '0.0.1-SNAPSHOT'
@@ -33,6 +34,12 @@ jacocoTestReport {
         csv.required = false
     }
     finalizedBy jacocoTestCoverageVerification
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 7.0f
+    formats = ['HTML', 'JSON']
+    suppressionFile = file("$projectDir/owasp-suppressions.xml").exists() ? "$projectDir/owasp-suppressions.xml" : null
 }
 
 jacocoTestCoverageVerification {
@@ -94,6 +101,30 @@ tasks.named('test') {
 	// Exclude Selenium tests from JUnit test task
 	exclude 'io/spring/selenium/**'
 	finalizedBy jacocoTestReport
+}
+
+// Unit tests: pure domain logic without Spring context
+tasks.register('unitTest', Test) {
+	description = 'Run unit tests (core domain logic)'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/core/**'
+	exclude 'io/spring/selenium/**'
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
+}
+
+// Integration tests: tests requiring Spring context (API, infrastructure, application)
+tasks.register('integrationTest', Test) {
+	description = 'Run integration tests (Spring context required)'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/api/**', 'io/spring/infrastructure/**', 'io/spring/application/**'
+	exclude 'io/spring/selenium/**'
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
 }
 
 // Separate task for Selenium E2E tests using TestNG
