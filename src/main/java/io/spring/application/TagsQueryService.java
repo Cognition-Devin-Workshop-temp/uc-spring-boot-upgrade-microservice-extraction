@@ -1,5 +1,6 @@
 package io.spring.application;
 
+import io.spring.core.article.Tag;
 import io.spring.infrastructure.mybatis.readservice.TagReadService;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -12,5 +13,13 @@ public class TagsQueryService {
 
   public List<String> allTags() {
     return tagReadService.all();
+  }
+
+  public List<Tag> allTagEntities() {
+    return tagReadService.allTags();
+  }
+
+  public Tag findById(String id) {
+    return tagReadService.findById(id);
   }
 }

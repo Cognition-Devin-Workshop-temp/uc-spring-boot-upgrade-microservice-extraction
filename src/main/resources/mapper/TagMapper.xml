@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.infrastructure.mybatis.mapper.TagMapper">
+    <resultMap id="tag" type="io.spring.core.article.Tag">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+
+    <insert id="insert">
+        insert into tags (id, name) values (#{tag.id}, #{tag.name})
+    </insert>
+
+    <select id="findById" resultMap="tag">
+        select id, name from tags where id = #{id}
+    </select>
+
+    <select id="findByName" resultMap="tag">
+        select id, name from tags where name = #{name}
+    </select>
+
+    <select id="findAll" resultMap="tag">
+        select id, name from tags order by name
+    </select>
+
+    <update id="update">
+        update tags set name = #{tag.name} where id = #{tag.id}
+    </update>
+
+    <delete id="delete">
+        delete from tags where id = #{id}
+    </delete>
+</mapper>
