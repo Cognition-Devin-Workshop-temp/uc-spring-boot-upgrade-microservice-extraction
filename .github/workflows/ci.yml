@@ -183,13 +183,12 @@ jobs:
       - name: Run OWASP Dependency-Check
         uses: dependency-check/Dependency-Check_Action@main
         env:
-          JAVA_HOME: ${{ env.JAVA_HOME }}
+          JAVA_HOME: /opt/java/openjdk
         with:
           project: uc-spring-boot-upgrade-microservice-extraction
           path: .
           format: HTML
-          args: >-
-            --failOnCVSS 7
+          args: --failOnCVSS 7
 
       - name: Upload OWASP Dependency-Check report
         uses: actions/upload-artifact@v4
