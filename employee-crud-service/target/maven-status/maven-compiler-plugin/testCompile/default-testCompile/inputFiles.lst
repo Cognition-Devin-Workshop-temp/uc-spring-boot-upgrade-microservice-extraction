@@ -1,0 +1,5 @@
+/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/test/java/com/example/employee/EmployeeCrudServiceApplicationTests.java
+/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/test/java/com/example/employee/controller/EmployeeControllerTest.java
+/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/test/java/com/example/employee/exception/GlobalExceptionHandlerTest.java
+/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/test/java/com/example/employee/model/EmployeeTest.java
+/home/ubuntu/repos/uc-spring-boot-upgrade-microservice-extraction/employee-crud-service/src/test/java/com/example/employee/service/EmployeeServiceTest.java
