@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.shipment.infrastructure.mybatis.mapper.TrackingEventMapper">
+
+    <resultMap id="trackingEventResult" type="io.spring.shipment.core.TrackingEvent">
+        <id property="id" column="id"/>
+        <result property="shipmentId" column="shipment_id"/>
+        <result property="status" column="status"/>
+        <result property="location" column="location"/>
+        <result property="description" column="description"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insert">
+        insert into tracking_events (id, shipment_id, status, location, description, created_at)
+        values (#{event.id}, #{event.shipmentId}, #{event.status}, #{event.location},
+            #{event.description}, #{event.createdAt})
+    </insert>
+
+    <select id="findByShipmentId" resultMap="trackingEventResult">
+        select * from tracking_events
+        where shipment_id = #{shipmentId}
+        order by created_at asc
+    </select>
+
+</mapper>
