@@ -43,36 +43,27 @@ public class ArticleApi {
       @PathVariable("slug") String slug,
       @AuthenticationPrincipal User user,
       @Valid @RequestBody UpdateArticleParam updateArticleParam) {
-    return articleRepository
-        .findBySlug(slug)
-        .map(
-            article -> {
-              if (!AuthorizationService.canWriteArticle(user, article)) {
-                throw new NoAuthorizationException();
-              }
-              Article updatedArticle =
-                  articleCommandService.updateArticle(article, updateArticleParam);
-              return ResponseEntity.ok(
-                  ResponseWrapper.wrap(
-                      "article",
-                      articleQueryService.findBySlug(updatedArticle.getSlug(), user).get()));
-            })
-        .orElseThrow(ResourceNotFoundException::new);
+    Article article = findArticleAndCheckAuthorization(slug, user);
+    Article updatedArticle = articleCommandService.updateArticle(article, updateArticleParam);
+    return ResponseEntity.ok(
+        ResponseWrapper.wrap(
+            "article", articleQueryService.findBySlug(updatedArticle.getSlug(), user).get()));
   }
 
   @DeleteMapping
   public ResponseEntity deleteArticle(
       @PathVariable("slug") String slug, @AuthenticationPrincipal User user) {
-    return articleRepository
-        .findBySlug(slug)
-        .map(
-            article -> {
-              if (!AuthorizationService.canWriteArticle(user, article)) {
-                throw new NoAuthorizationException();
-              }
-              articleRepository.remove(article);
-              return ResponseEntity.noContent().build();
-            })
-        .orElseThrow(ResourceNotFoundException::new);
+    Article article = findArticleAndCheckAuthorization(slug, user);
+    articleRepository.remove(article);
+    return ResponseEntity.noContent().build();
+  }
+
+  private Article findArticleAndCheckAuthorization(String slug, User user) {
+    Article article =
+        articleRepository.findBySlug(slug).orElseThrow(ResourceNotFoundException::new);
+    if (!AuthorizationService.canWriteArticle(user, article)) {
+      throw new NoAuthorizationException();
+    }
+    return article;
   }
 }
