@@ -199,13 +199,15 @@ jobs:
 
       - name: Run OWASP Dependency-Check (fail on CVSS >= 7.0)
         run: |
+          mkdir -p build/reports/owasp
           ~/owasp-dependency-check/bin/dependency-check.sh \
             --project "uc-spring-boot-upgrade-microservice-extraction" \
             --scan . \
             --format HTML \
             --format JSON \
             --failOnCVSS 7 \
-            --out build/reports/owasp
+            --out build/reports/owasp \
+            --enableExperimental
 
       - name: Upload OWASP Dependency-Check report
         if: always()
