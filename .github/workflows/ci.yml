@@ -103,6 +103,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run OWASP Dependency-Check (fail on CVSS >= 7.0)
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: ./gradlew dependencyCheckAnalyze
 
       - name: Upload OWASP Report
