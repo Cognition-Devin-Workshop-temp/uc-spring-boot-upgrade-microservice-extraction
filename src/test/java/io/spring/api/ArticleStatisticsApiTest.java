@@ -1,9 +1,7 @@
 package io.spring.api;
 
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -107,8 +105,7 @@ public class ArticleStatisticsApiTest extends TestWithCurrentUser {
   public void should_return_at_most_10_trending_articles() throws Exception {
     TrendingArticleData[] articles = new TrendingArticleData[10];
     for (int i = 0; i < 10; i++) {
-      articles[i] =
-          new TrendingArticleData("slug-" + i, "Title " + i, "Desc " + i, 100 - i * 5);
+      articles[i] = new TrendingArticleData("slug-" + i, "Title " + i, "Desc " + i, 100 - i * 5);
     }
     List<TrendingArticleData> trendingArticles = Arrays.asList(articles);
 
