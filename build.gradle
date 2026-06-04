@@ -27,6 +27,7 @@ jacoco {
 
 jacocoTestReport {
     dependsOn test
+    executionData fileTree(dir: "${buildDir}/jacoco", includes: ['*.exec'])
     reports {
         xml.required = true
         html.required = true
@@ -36,6 +37,7 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
+    executionData fileTree(dir: "${buildDir}/jacoco", includes: ['*.exec'])
     violationRules {
         rule {
             limit {
@@ -94,6 +96,23 @@ tasks.named('test') {
 	// Exclude Selenium tests from JUnit test task
 	exclude 'io/spring/selenium/**'
 	finalizedBy jacocoTestReport
+}
+
+// Unit tests: core domain logic and application services
+tasks.register('unitTest', Test) {
+	description = 'Run unit tests'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/core/**', 'io/spring/application/**'
+}
+
+// Integration tests: API endpoints, repository/infrastructure, and context loading
+tasks.register('integrationTest', Test) {
+	description = 'Run integration tests'
+	group = 'verification'
+	useJUnitPlatform()
+	include 'io/spring/api/**', 'io/spring/infrastructure/**', 'io/spring/RealworldApplicationTests*'
+	exclude 'io/spring/selenium/**'
 }
 
 // Separate task for Selenium E2E tests using TestNG
