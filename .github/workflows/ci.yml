@@ -188,7 +188,7 @@ jobs:
 
       - name: Install OWASP Dependency-Check CLI
         run: |
-          DC_VERSION=12.1.0
+          DC_VERSION=10.0.4
           if [ ! -f ~/owasp-dependency-check/bin/dependency-check.sh ]; then
             mkdir -p ~/owasp-dependency-check
             wget -q "https://github.com/jeremylong/DependencyCheck/releases/download/v${DC_VERSION}/dependency-check-${DC_VERSION}-release.zip" -O /tmp/dc.zip
@@ -205,8 +205,7 @@ jobs:
             --format HTML \
             --format JSON \
             --failOnCVSS 7 \
-            --out build/reports/owasp \
-            --enableExperimental
+            --out build/reports/owasp
 
       - name: Upload OWASP Dependency-Check report
         if: always()
