@@ -171,23 +171,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Cache OWASP NVD data
-        uses: actions/cache@v4
-        with:
-          path: ~/.gradle/dependency-check-data
-          key: ${{ runner.os }}-owasp-nvd-${{ github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-owasp-nvd-
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Build project for dependency scan
+        run: ./gradlew build -x test -x jacocoTestCoverageVerification --no-daemon
+
       - name: Run OWASP Dependency-Check (fail on CVSS >= 7.0)
-        run: ./gradlew dependencyCheckAnalyze --no-daemon
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'uc-spring-boot-upgrade-microservice-extraction'
+          path: '.'
+          format: 'HTML,JSON'
+          args: >
+            --failOnCVSS 7
+            --enableExperimental
 
       - name: Upload OWASP Dependency-Check report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: owasp-dependency-check-report
-          path: build/reports/dependency-check-report.*
+          path: reports/
