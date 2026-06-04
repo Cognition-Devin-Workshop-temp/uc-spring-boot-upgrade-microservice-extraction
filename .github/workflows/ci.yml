@@ -177,14 +177,35 @@ jobs:
       - name: Build project for dependency scan
         run: ./gradlew build -x test -x jacocoTestCoverageVerification --no-daemon
 
-      - name: Run OWASP Dependency-Check (fail on CVSS >= 7.0)
-        uses: dependency-check/Dependency-Check_Action@main
+      - name: Cache OWASP Dependency-Check data
+        uses: actions/cache@v4
         with:
-          project: 'uc-spring-boot-upgrade-microservice-extraction'
-          path: '.'
-          format: 'HTML,JSON'
-          args: >
-            --failOnCVSS 7
+          path: |
+            ~/owasp-dependency-check/data
+          key: ${{ runner.os }}-owasp-data-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-owasp-data-
+
+      - name: Install OWASP Dependency-Check CLI
+        run: |
+          DC_VERSION=12.1.0
+          if [ ! -f ~/owasp-dependency-check/bin/dependency-check.sh ]; then
+            mkdir -p ~/owasp-dependency-check
+            wget -q "https://github.com/jeremylong/DependencyCheck/releases/download/v${DC_VERSION}/dependency-check-${DC_VERSION}-release.zip" -O /tmp/dc.zip
+            unzip -q -o /tmp/dc.zip -d ~/owasp-dependency-check
+            mv ~/owasp-dependency-check/dependency-check/* ~/owasp-dependency-check/
+            rmdir ~/owasp-dependency-check/dependency-check
+          fi
+
+      - name: Run OWASP Dependency-Check (fail on CVSS >= 7.0)
+        run: |
+          ~/owasp-dependency-check/bin/dependency-check.sh \
+            --project "uc-spring-boot-upgrade-microservice-extraction" \
+            --scan . \
+            --format HTML \
+            --format JSON \
+            --failOnCVSS 7 \
+            --out build/reports/owasp \
             --enableExperimental
 
       - name: Upload OWASP Dependency-Check report
@@ -192,4 +213,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: owasp-dependency-check-report
-          path: reports/
+          path: build/reports/owasp/
