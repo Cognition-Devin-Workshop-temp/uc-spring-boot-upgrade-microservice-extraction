@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.infrastructure.mybatis.readservice.ArticleStatsReadService">
+
+    <resultMap id="trendingArticleData" type="io.spring.application.data.TrendingArticleData">
+        <result column="articleSlug" property="slug"/>
+        <result column="articleTitle" property="title"/>
+        <result column="articleDescription" property="description"/>
+        <result column="favoriteCount" property="favoriteCount"/>
+        <result column="articleCreatedAt" property="createdAt"/>
+        <association property="author" resultMap="transfer.data.profileData"/>
+    </resultMap>
+
+    <select id="articleExistsBySlug" resultType="java.lang.Boolean">
+        select count(1) from articles where slug = #{slug}
+    </select>
+
+    <select id="favoriteCountBySlug" resultType="java.lang.Integer">
+        select count(1)
+        from article_favorites AF
+        join articles A on A.id = AF.article_id
+        where A.slug = #{slug}
+    </select>
+
+    <select id="commentCountBySlug" resultType="java.lang.Integer">
+        select count(1)
+        from comments C
+        join articles A on A.id = C.article_id
+        where A.slug = #{slug}
+    </select>
+
+    <select id="createdAtBySlug" resultType="java.lang.String">
+        select A.created_at
+        from articles A
+        where A.slug = #{slug}
+    </select>
+
+    <select id="findTrendingArticles" resultMap="trendingArticleData">
+        select
+            A.slug articleSlug,
+            A.title articleTitle,
+            A.description articleDescription,
+            count(AF.user_id) as favoriteCount,
+            A.created_at articleCreatedAt,
+            U.id userId,
+            U.username userUsername,
+            U.bio userBio,
+            U.image userImage
+        from articles A
+        join article_favorites AF on A.id = AF.article_id
+        left join users U on U.id = A.user_id
+        where A.created_at >= datetime('now', '-' || #{days} || ' days')
+        group by A.id
+        order by favoriteCount desc
+        limit #{limit}
+    </select>
+
+</mapper>

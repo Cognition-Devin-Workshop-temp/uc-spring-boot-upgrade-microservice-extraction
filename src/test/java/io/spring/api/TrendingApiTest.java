@@ -1,6 +1,5 @@
 package io.spring.api;
 
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.ArgumentMatchers.eq;
@@ -66,8 +65,7 @@ public class TrendingApiTest extends TestWithCurrentUser {
 
   @Test
   public void should_return_empty_list_when_no_trending_articles() throws Exception {
-    when(articleStatsQueryService.getTrendingArticles(eq(10), eq(7)))
-        .thenReturn(new ArrayList<>());
+    when(articleStatsQueryService.getTrendingArticles(eq(10), eq(7))).thenReturn(new ArrayList<>());
 
     RestAssuredMockMvc.when()
         .get("/api/stats/trending")
