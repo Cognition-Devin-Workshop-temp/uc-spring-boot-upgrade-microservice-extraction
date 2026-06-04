@@ -168,18 +168,34 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-owasp-nvd-
 
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build project to resolve dependencies
+        run: ./gradlew build -x test -x jacocoTestCoverageVerification -x jacocoTestReport
+
       - name: Install OWASP Dependency-Check CLI
         run: |
           DC_VERSION="10.0.4"
           wget -q "https://github.com/jeremylong/DependencyCheck/releases/download/v${DC_VERSION}/dependency-check-${DC_VERSION}-release.zip"
-          unzip -q "dependency-check-${DC_VERSION}-release.zip"
-          chmod +x dependency-check/bin/dependency-check.sh
+          unzip -q "dependency-check-${DC_VERSION}-release.zip" -d /tmp/owasp
+          chmod +x /tmp/owasp/dependency-check/bin/dependency-check.sh
 
       - name: Run OWASP Dependency-Check (fails on CVSS >= 7.0)
         run: |
-          ./dependency-check/bin/dependency-check.sh \
+          /tmp/owasp/dependency-check/bin/dependency-check.sh \
             --project "uc-spring-boot-upgrade-microservice-extraction" \
-            --scan "." \
+            --scan "build/libs" \
             --format HTML \
             --format JSON \
             --failOnCVSS 7 \
