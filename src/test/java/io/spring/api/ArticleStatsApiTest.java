@@ -40,11 +40,7 @@ public class ArticleStatsApiTest extends TestWithCurrentUser {
     RestAssuredMockMvc.mockMvc(mvc);
     article =
         new Article(
-            "Test New Article",
-            "Desc",
-            "Body",
-            Arrays.asList("java", "spring"),
-            user.getId());
+            "Test New Article", "Desc", "Body", Arrays.asList("java", "spring"), user.getId());
   }
 
   @Test

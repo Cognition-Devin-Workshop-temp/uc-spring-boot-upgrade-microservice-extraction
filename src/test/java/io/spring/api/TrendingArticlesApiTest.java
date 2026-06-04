@@ -62,11 +62,6 @@ public class TrendingArticlesApiTest extends TestWithCurrentUser {
   public void should_return_empty_list_when_no_trending_articles() throws Exception {
     when(articleStatisticsQueryService.getTrendingArticles()).thenReturn(new ArrayList<>());
 
-    given()
-        .when()
-        .get("/stats/trending")
-        .then()
-        .statusCode(200)
-        .body("articles", hasSize(0));
+    given().when().get("/stats/trending").then().statusCode(200).body("articles", hasSize(0));
   }
 }
