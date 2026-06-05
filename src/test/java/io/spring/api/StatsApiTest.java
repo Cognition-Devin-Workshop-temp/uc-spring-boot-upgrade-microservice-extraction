@@ -41,7 +41,8 @@ public class StatsApiTest extends TestWithCurrentUser {
     DateTime now = new DateTime();
     List<TrendingArticleData> trending =
         Arrays.asList(
-            new TrendingArticleData("popular-article", "Popular Article", "A popular article", 50, now),
+            new TrendingArticleData(
+                "popular-article", "Popular Article", "A popular article", 50, now),
             new TrendingArticleData("another-hit", "Another Hit", "Another hit article", 30, now));
 
     when(articleStatsQueryService.getTrendingArticles()).thenReturn(trending);
@@ -81,11 +82,7 @@ public class StatsApiTest extends TestWithCurrentUser {
     for (int i = 0; i < 10; i++) {
       trending.add(
           new TrendingArticleData(
-              "article-" + i,
-              "Article " + i,
-              "Description " + i,
-              100 - i * 10,
-              now));
+              "article-" + i, "Article " + i, "Description " + i, 100 - i * 10, now));
     }
 
     when(articleStatsQueryService.getTrendingArticles()).thenReturn(trending);
@@ -105,10 +102,6 @@ public class StatsApiTest extends TestWithCurrentUser {
   public void should_access_trending_without_authentication() throws Exception {
     when(articleStatsQueryService.getTrendingArticles()).thenReturn(new ArrayList<>());
 
-    given()
-        .when()
-        .get("/stats/trending")
-        .then()
-        .statusCode(200);
+    given().when().get("/stats/trending").then().statusCode(200);
   }
 }

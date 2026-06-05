@@ -1,6 +1,10 @@
 package io.spring.api;
 
 import io.spring.application.ArticleStatsQueryService;
+import io.spring.application.data.TrendingArticleData;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +19,16 @@ public class StatsApi {
 
   @GetMapping(path = "/trending")
   public ResponseEntity<?> getTrendingArticles() {
-    // TODO: implement in GREEN phase
-    return ResponseEntity.status(501).build();
+    List<TrendingArticleData> trending = articleStatsQueryService.getTrendingArticles();
+    return ResponseEntity.ok(trendingResponse(trending));
+  }
+
+  private Map<String, Object> trendingResponse(List<TrendingArticleData> articles) {
+    return new HashMap<String, Object>() {
+      {
+        put("articles", articles);
+        put("articlesCount", articles.size());
+      }
+    };
   }
 }

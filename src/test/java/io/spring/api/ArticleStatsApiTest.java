@@ -71,14 +71,9 @@ public class ArticleStatsApiTest extends TestWithCurrentUser {
   @Test
   public void should_404_if_article_not_found_for_stats() throws Exception {
     when(articleStatsQueryService.getArticleStats(eq("non-existent")))
-        .thenThrow(
-            new io.spring.api.exception.ResourceNotFoundException());
+        .thenThrow(new io.spring.api.exception.ResourceNotFoundException());
 
-    given()
-        .when()
-        .get("/articles/{slug}/stats", "non-existent")
-        .then()
-        .statusCode(404);
+    given().when().get("/articles/{slug}/stats", "non-existent").then().statusCode(404);
   }
 
   @Test
