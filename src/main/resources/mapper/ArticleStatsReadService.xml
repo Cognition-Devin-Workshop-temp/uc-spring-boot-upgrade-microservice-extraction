@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.spring.infrastructure.mybatis.readservice.ArticleStatsReadService">
+    <select id="countCommentsByArticleId" resultType="java.lang.Integer">
+        select count(1) from comments where article_id = #{articleId}
+    </select>
+    <resultMap id="trendingArticleData" type="io.spring.application.data.TrendingArticleData">
+        <result column="slug" property="slug"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="favoriteCount" property="favoriteCount"/>
+        <result column="createdAt" property="createdAt"/>
+    </resultMap>
+    <select id="findTrendingArticles" resultMap="trendingArticleData">
+        select
+            A.slug,
+            A.title,
+            A.description,
+            count(AF.user_id) as favoriteCount,
+            A.created_at as createdAt
+        from articles A
+        left join article_favorites AF on A.id = AF.article_id
+        where A.created_at >= #{since}
+        group by A.id
+        order by favoriteCount desc
+        limit #{limit}
+    </select>
+</mapper>
