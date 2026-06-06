@@ -1,7 +1,10 @@
 package io.spring.application.article;
 
+import io.spring.api.exception.NoAuthorizationException;
+import io.spring.api.exception.ResourceNotFoundException;
 import io.spring.core.article.Article;
 import io.spring.core.article.ArticleRepository;
+import io.spring.core.service.AuthorizationService;
 import io.spring.core.user.User;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -33,6 +36,15 @@ public class ArticleCommandService {
         updateArticleParam.getDescription(),
         updateArticleParam.getBody());
     articleRepository.save(article);
+    return article;
+  }
+
+  public Article findArticleBySlugAndVerifyAuthor(String slug, User user) {
+    Article article =
+        articleRepository.findBySlug(slug).orElseThrow(ResourceNotFoundException::new);
+    if (!AuthorizationService.canWriteArticle(user, article)) {
+      throw new NoAuthorizationException();
+    }
     return article;
   }
 }

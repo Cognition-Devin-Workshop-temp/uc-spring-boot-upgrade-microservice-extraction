@@ -28,6 +28,7 @@ import io.spring.graphql.types.ArticleEdge;
 import io.spring.graphql.types.ArticlesConnection;
 import io.spring.graphql.types.Profile;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.joda.time.format.ISODateTimeFormat;
@@ -64,25 +65,7 @@ public class ArticleDatafetcher {
               current,
               new CursorPageParameter<>(DateTimeCursor.parse(before), last, Direction.PREV));
     }
-    graphql.relay.PageInfo pageInfo = buildArticlePageInfo(articles);
-    ArticlesConnection articlesConnection =
-        ArticlesConnection.newBuilder()
-            .pageInfo(pageInfo)
-            .edges(
-                articles.getData().stream()
-                    .map(
-                        a ->
-                            ArticleEdge.newBuilder()
-                                .cursor(a.getCursor().toString())
-                                .node(buildArticleResult(a))
-                                .build())
-                    .collect(Collectors.toList()))
-            .build();
-    return DataFetcherResult.<ArticlesConnection>newResult()
-        .data(articlesConnection)
-        .localContext(
-            articles.getData().stream().collect(Collectors.toMap(ArticleData::getSlug, a -> a)))
-        .build();
+    return buildConnectionResult(articles);
   }
 
   @DgsData(parentType = PROFILE.TYPE_NAME, field = PROFILE.Feed)
@@ -114,25 +97,7 @@ public class ArticleDatafetcher {
               target,
               new CursorPageParameter<>(DateTimeCursor.parse(before), last, Direction.PREV));
     }
-    graphql.relay.PageInfo pageInfo = buildArticlePageInfo(articles);
-    ArticlesConnection articlesConnection =
-        ArticlesConnection.newBuilder()
-            .pageInfo(pageInfo)
-            .edges(
-                articles.getData().stream()
-                    .map(
-                        a ->
-                            ArticleEdge.newBuilder()
-                                .cursor(a.getCursor().toString())
-                                .node(buildArticleResult(a))
-                                .build())
-                    .collect(Collectors.toList()))
-            .build();
-    return DataFetcherResult.<ArticlesConnection>newResult()
-        .data(articlesConnection)
-        .localContext(
-            articles.getData().stream().collect(Collectors.toMap(ArticleData::getSlug, a -> a)))
-        .build();
+    return buildConnectionResult(articles);
   }
 
   @DgsData(parentType = PROFILE.TYPE_NAME, field = PROFILE.Favorites)
@@ -167,26 +132,7 @@ public class ArticleDatafetcher {
               new CursorPageParameter<>(DateTimeCursor.parse(before), last, Direction.PREV),
               current);
     }
-    graphql.relay.PageInfo pageInfo = buildArticlePageInfo(articles);
-
-    ArticlesConnection articlesConnection =
-        ArticlesConnection.newBuilder()
-            .pageInfo(pageInfo)
-            .edges(
-                articles.getData().stream()
-                    .map(
-                        a ->
-                            ArticleEdge.newBuilder()
-                                .cursor(a.getCursor().toString())
-                                .node(buildArticleResult(a))
-                                .build())
-                    .collect(Collectors.toList()))
-            .build();
-    return DataFetcherResult.<ArticlesConnection>newResult()
-        .data(articlesConnection)
-        .localContext(
-            articles.getData().stream().collect(Collectors.toMap(ArticleData::getSlug, a -> a)))
-        .build();
+    return buildConnectionResult(articles);
   }
 
   @DgsData(parentType = PROFILE.TYPE_NAME, field = PROFILE.Articles)
@@ -221,25 +167,7 @@ public class ArticleDatafetcher {
               new CursorPageParameter<>(DateTimeCursor.parse(before), last, Direction.PREV),
               current);
     }
-    graphql.relay.PageInfo pageInfo = buildArticlePageInfo(articles);
-    ArticlesConnection articlesConnection =
-        ArticlesConnection.newBuilder()
-            .pageInfo(pageInfo)
-            .edges(
-                articles.getData().stream()
-                    .map(
-                        a ->
-                            ArticleEdge.newBuilder()
-                                .cursor(a.getCursor().toString())
-                                .node(buildArticleResult(a))
-                                .build())
-                    .collect(Collectors.toList()))
-            .build();
-    return DataFetcherResult.<ArticlesConnection>newResult()
-        .data(articlesConnection)
-        .localContext(
-            articles.getData().stream().collect(Collectors.toMap(ArticleData::getSlug, a -> a)))
-        .build();
+    return buildConnectionResult(articles);
   }
 
   @DgsData(parentType = DgsConstants.QUERY_TYPE, field = QUERY.Articles)
@@ -276,6 +204,55 @@ public class ArticleDatafetcher {
               new CursorPageParameter<>(DateTimeCursor.parse(before), last, Direction.PREV),
               current);
     }
+    return buildConnectionResult(articles);
+  }
+
+  @DgsData(parentType = ARTICLEPAYLOAD.TYPE_NAME, field = ARTICLEPAYLOAD.Article)
+  public DataFetcherResult<Article> getArticle(DataFetchingEnvironment dfe) {
+    io.spring.core.article.Article article = dfe.getLocalContext();
+
+    User current = SecurityUtil.getCurrentUser().orElse(null);
+    ArticleData articleData =
+        articleQueryService
+            .findById(article.getId(), current)
+            .orElseThrow(ResourceNotFoundException::new);
+    Article articleResult = buildArticleResult(articleData);
+    return DataFetcherResult.<Article>newResult()
+        .localContext(buildSingleArticleContext(articleData))
+        .data(articleResult)
+        .build();
+  }
+
+  @DgsData(parentType = COMMENT.TYPE_NAME, field = COMMENT.Article)
+  public DataFetcherResult<Article> getCommentArticle(
+      DataFetchingEnvironment dataFetchingEnvironment) {
+    CommentData comment = dataFetchingEnvironment.getLocalContext();
+    User current = SecurityUtil.getCurrentUser().orElse(null);
+    ArticleData articleData =
+        articleQueryService
+            .findById(comment.getArticleId(), current)
+            .orElseThrow(ResourceNotFoundException::new);
+    Article articleResult = buildArticleResult(articleData);
+    return DataFetcherResult.<Article>newResult()
+        .localContext(buildSingleArticleContext(articleData))
+        .data(articleResult)
+        .build();
+  }
+
+  @DgsQuery(field = QUERY.Article)
+  public DataFetcherResult<Article> findArticleBySlug(@InputArgument("slug") String slug) {
+    User current = SecurityUtil.getCurrentUser().orElse(null);
+    ArticleData articleData =
+        articleQueryService.findBySlug(slug, current).orElseThrow(ResourceNotFoundException::new);
+    Article articleResult = buildArticleResult(articleData);
+    return DataFetcherResult.<Article>newResult()
+        .localContext(buildSingleArticleContext(articleData))
+        .data(articleResult)
+        .build();
+  }
+
+  private DataFetcherResult<ArticlesConnection> buildConnectionResult(
+      CursorPager<ArticleData> articles) {
     graphql.relay.PageInfo pageInfo = buildArticlePageInfo(articles);
     ArticlesConnection articlesConnection =
         ArticlesConnection.newBuilder()
@@ -297,63 +274,12 @@ public class ArticleDatafetcher {
         .build();
   }
 
-  @DgsData(parentType = ARTICLEPAYLOAD.TYPE_NAME, field = ARTICLEPAYLOAD.Article)
-  public DataFetcherResult<Article> getArticle(DataFetchingEnvironment dfe) {
-    io.spring.core.article.Article article = dfe.getLocalContext();
-
-    User current = SecurityUtil.getCurrentUser().orElse(null);
-    ArticleData articleData =
-        articleQueryService
-            .findById(article.getId(), current)
-            .orElseThrow(ResourceNotFoundException::new);
-    Article articleResult = buildArticleResult(articleData);
-    return DataFetcherResult.<Article>newResult()
-        .localContext(
-            new HashMap<String, Object>() {
-              {
-                put(articleData.getSlug(), articleData);
-              }
-            })
-        .data(articleResult)
-        .build();
-  }
-
-  @DgsData(parentType = COMMENT.TYPE_NAME, field = COMMENT.Article)
-  public DataFetcherResult<Article> getCommentArticle(
-      DataFetchingEnvironment dataFetchingEnvironment) {
-    CommentData comment = dataFetchingEnvironment.getLocalContext();
-    User current = SecurityUtil.getCurrentUser().orElse(null);
-    ArticleData articleData =
-        articleQueryService
-            .findById(comment.getArticleId(), current)
-            .orElseThrow(ResourceNotFoundException::new);
-    Article articleResult = buildArticleResult(articleData);
-    return DataFetcherResult.<Article>newResult()
-        .localContext(
-            new HashMap<String, Object>() {
-              {
-                put(articleData.getSlug(), articleData);
-              }
-            })
-        .data(articleResult)
-        .build();
-  }
-
-  @DgsQuery(field = QUERY.Article)
-  public DataFetcherResult<Article> findArticleBySlug(@InputArgument("slug") String slug) {
-    User current = SecurityUtil.getCurrentUser().orElse(null);
-    ArticleData articleData =
-        articleQueryService.findBySlug(slug, current).orElseThrow(ResourceNotFoundException::new);
-    Article articleResult = buildArticleResult(articleData);
-    return DataFetcherResult.<Article>newResult()
-        .localContext(
-            new HashMap<String, Object>() {
-              {
-                put(articleData.getSlug(), articleData);
-              }
-            })
-        .data(articleResult)
-        .build();
+  private Map<String, Object> buildSingleArticleContext(ArticleData articleData) {
+    return new HashMap<String, Object>() {
+      {
+        put(articleData.getSlug(), articleData);
+      }
+    };
   }
 
   private DefaultPageInfo buildArticlePageInfo(CursorPager<ArticleData> articles) {
